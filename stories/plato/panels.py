@@ -195,7 +195,7 @@ def paper_note(c, x, y, s, lines_, t, t0=0.0, rot=-0.04, red=False, sig=None):
 
 def tag2(c, x, y, s_, t, t0, col="#ffc24a", tcol="#11131a", size=40):
     sc = popin(t, t0)
-    if sc <= 0: return
+    if sc <= 0.01: return
     c.save(); c.translate(x, y); c.scale(sc, sc); tag(c, 0, 0, s_, col, tcol, size); c.restore()
 
 def hospital(c, t, babies=2, take=0.0):
@@ -215,15 +215,17 @@ def hospital(c, t, babies=2, take=0.0):
 def chest_scar(c, t, hand=0.0, glow_a=0.0):
     vgrad(c, 0, 0, P, P, "#3a2a26", "#1a1210")
     poly(c, [(100, 0), (980, 0), (1080, 1080), (0, 1080)], "#2f6f8f")
-    poly(c, [(380, 0), (700, 0), (640, 1080), (440, 1080)], "#c48a5c")
-    c.save(); c.rectangle(380, 0, 320, P); c.clip(); ell(c, 640, 540, 140, 600, hx("#3a1408", 0.18)); c.restore()
+    poly(c, [(300, 0), (780, 0), (630, 1080), (450, 1080)], "#c48a5c")
+    ell(c, 700, 300, 120, 500, hx("#3a1408", 0.15))
     if glow_a: glow(c, 545, 560, 260, "#ff3a3a", 0.35 * glow_a)
     line(c, [(545, 300), (540, 820)], "#a05a4a", 14); line(c, [(545, 300), (540, 820)], "#d8907a", 6)
     for k in range(10): line(c, [(522, 330 + k * 50), (566, 330 + k * 50)], "#a05a4a", 5)
     if hand > 0:
-        hx_ = 820 - 260 * ease(hand)
-        rrect(c, hx_, 470, 330, 180, 80, "#c48a5c"); rrect(c, hx_ + 20, 480, 300, 30, 15, "#b07a50")
-        line(c, [(hx_ + 300, 560), (1080, 640)], "#2f6f8f", 150)
+        hx_ = 860 - 300 * ease(hand)
+        line(c, [(hx_ + 260, 600), (1180, 760)], "#2f6f8f", 170)
+        rrect(c, hx_ + 60, 500, 230, 190, 60, "#c48a5c")
+        for k in range(4): rrect(c, hx_ - 60 + k * 12, 500 + k * 44, 170, 40, 20, "#c48a5c"); line(c, [(hx_ - 50 + k * 12, 538 + k * 44), (hx_ + 90, 538 + k * 44)], hx("#7a4a2a", 0.4), 3)
+        rrect(c, hx_ + 40, 450, 110, 44, 22, "#c48a5c")
 
 def envelope(c, x, y, s, t, open_=0.0, logo=True):
     def f():
@@ -418,7 +420,7 @@ def a14(c, t, T, w):
     band(c, 540, 380, 1.25 * popin(t, w("manillas")), "TÚ", rot=-0.05, hl=0.0)
     if t > k2 - 0.2: band(c, 540, 640, 1.25 * popin(t, k2 - 0.2), "GABRIEL", rot=0.04, hl=clamp((t - k2) / 0.5), glow_a=1.0, col="#ff7aa0")
 FOCUS["a14"] = (540, 640)
-CAM["a14"] = [("manillas", 1.0, 540, 540), ("tiene", 1.5, 540, 380), ("gabriel", 1.5, 540, 640)]
+CAM["a14"] = [("manillas", 1.0, 540, 540), ("tiene", 1.3, 540, 440), ("gabriel", 1.3, 540, 640)]
 
 def a15(c, t, T, w):
     k = w("cicatriz")
@@ -454,7 +456,7 @@ def b01(c, t, T, w):
     c.save(); c.rectangle(0, 0, 300, P); c.clip(); bust(c, 120, 1120, 0.85, t, "worry", look=(1, -0.2), **YOU); c.restore()
     k2 = w("nombre")
     if t > k2 - 0.1:
-        sc = popin(t, k2 - 0.1)
+        sc = max(0.01, popin(t, k2 - 0.1))
         c.save(); c.translate(560, 700); c.scale(sc, sc); bubble(c, -170, -60, 340, ["¿...?"], "#ffffff", "#11131a", 60); c.restore()
 FOCUS["b01"] = (560, 600)
 
@@ -581,7 +583,7 @@ def b15(c, t, T, w):
     if t < k: bust_back(c, 540, 1060, 1.0, t)
     else: bust(c, 540, 1060, 1.0, t, "neutral", look=(0, 0), **GAB)
 FOCUS["b15"] = (540, 600)
-CAM["b15"] = [("tiene", 1.35, 540, 560), ("ojos", 1.8, 540, 540), ("lunar", 2.4, 500, 720)]
+CAM["b15"] = [("tiene", 1.35, 540, 560), ("ojos", 1.8, 540, 540), ("lunar", 2.3, 510, 790)]
 
 def b16(c, t, T, w):
     dining(c, t, lamp=0.35); overlay(c, "#05081a", 0.25)
@@ -623,7 +625,7 @@ def c03(c, t, T, w):
     k = w("recibo")
     envelope(c, 540, 560, 1.2, t, open_=clamp((t - w("adentro")) / 0.6))
     if t > k - 0.3:
-        c.save(); c.translate(0, -260 * ease(clamp((t - k + 0.3) / 0.8))); receipt(c, 540, 600, 0.6, t); c.restore()
+        c.save(); c.translate(0, -170 * ease(clamp((t - k + 0.3) / 0.8))); receipt(c, 540, 600, 0.6, t); c.restore()
 FOCUS["c03"] = (540, 560)
 
 def c04(c, t, T, w):
@@ -636,7 +638,7 @@ def c05(c, t, T, w):
     rect(c, 0, 0, P, P, "#2a1f1c")
     receipt(c, 540, 400, 1.25, t, sig=clamp((t - w("firma")) / 0.9))
 FOCUS["c05"] = (500, 680)
-CAM["c05"] = [("firma", 1.6, 420, 680)]
+CAM["c05"] = [("firma", 1.6, 420, 780)]
 
 def c06(c, t, T, w):
     stairs(c, t, light=0.5)
@@ -660,10 +662,10 @@ def c08(c, t, T, w):
         rect(c, 0, 0, P, P, "#d8e4e0"); rrect(c, 300, 500, 480, 300, 30, hx("#bfe0f0", 0.6)); rrect(c, 300, 760, 480, 200, 20, "#c0c8cc")
         circ(c, 540, 650, 60, "#e0a880"); ell(c, 540, 720, 100, 50, "#c0d8f0")
         line(c, [(200, 300), (300, 300), (330, 240), (360, 360), (390, 300), (880, 300)], "#2ad07a", 6)
-        tag2(c, 540, 340, "CORAZÓN MALO", t, w("corazón"), "#e0303a", "#ffffff"); sepia(c, 0.7)
+        sepia(c, 0.7)
     elif t < w("papá") - 0.2:
         rect(c, 0, 0, P, P, "#d8cdb8"); sepia(c, 0.7)
-        sc = popin(t, w("operación"))
+        sc = max(0.01, popin(t, w("operación")))
         c.save(); c.translate(540, 540); c.scale(sc, sc); ui(c, 130); outline_text_(c, "$5.000.000", 0, 40, "#e0303a"); c.restore()
     else:
         rect(c, 0, 0, P, P, "#3a3028")
@@ -682,7 +684,7 @@ def c09(c, t, T, w):
     bust(c, 340, 1040, 0.9, t, "worry", look=(1, 0), **MAMA)
     poly(c, [(700, 380), (900, 380), (960, 1080), (640, 1080)], "#e8eef0"); circ(c, 800, 300, 90, "#d8a878"); c.new_path(); c.arc(800, 290, 96, math.pi, 2 * math.pi); fill(c, "#1a1414")
     rect(c, 740, 200, 120, 40, "#ffffff"); rect(c, 790, 205, 20, 30, "#e0303a")
-    if t > w("medellín") - 0.2: tag2(c, 800, 340, "PAREJA EN MEDELLÍN", t, w("medellín") - 0.2, "#ffc24a")
+    if t > w("medellín") - 0.2: tag2(c, 640, 400, "PAREJA EN MEDELLÍN", t, w("medellín") - 0.2, "#ffc24a")
     sepia(c, 0.7)
 FOCUS["c09"] = (560, 560)
 
@@ -693,7 +695,6 @@ FOCUS["c10"] = (540, 580)
 
 def c11(c, t, T, w):
     chest_scar(c, t, hand=clamp(t / 0.8), glow_a=0.5 + 0.5 * math.sin(t * 7))
-    tag2(c, 540, 340, "ESTÁS VIVO PORQUE...", t, w("vivo"), "#e0303a", "#ffffff", 38)
 FOCUS["c11"] = (540, 560)
 
 def c12(c, t, T, w):
@@ -704,7 +705,7 @@ def c12(c, t, T, w):
     else:
         road(c, t, crash=clamp((t - w("buscar") - 0.6) / 0.5))
         tag2(c, 540, 340, "LO IBA A BUSCAR", t, w("buscar"), "#ffc24a")
-FOCUS["c12"] = (540, 600)
+FOCUS["c12"] = (600, 600)
 
 def c13(c, t, T, w):
     dining(c, t, lamp=0.4, photo=False); overlay(c, "#05081a", 0.2)
@@ -740,7 +741,7 @@ def c18(c, t, T, w):
     band(c, 540, 540, 1.45, "", smudge=True, hl=clamp((t - w("fecha")) / 0.5), glow_a=1.0, col="#9a7aff")
     tag2(c, 540, 820, "¿UN TERCERO?", t, w("misma"), "#e0303a", "#ffffff", 46)
 FOCUS["c18"] = (540, 540)
-CAM["c18"] = [("tercera", 1.0, 540, 540), ("fecha", 1.7, 420, 600)]
+CAM["c18"] = [("tercera", 1.0, 540, 540), ("fecha", 1.4, 500, 620)]
 
 def c19(c, t, T, w):
     rect(c, 0, 0, P, P, "#1a1416"); band(c, 540, 300, 1.2, "", smudge=True, col="#9a7aff"); overlay(c, "#000", 0.6)
