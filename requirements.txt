@@ -1,0 +1,8 @@
+kokoro-onnx==0.6.1
+onnxruntime>=1.20
+cairocffi>=1.7
+numpy>=2.0
+scipy>=1.13
+soundfile>=0.12
+pillow>=10
+sherpa-onnx>=2.0
