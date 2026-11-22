@@ -57,6 +57,7 @@ def callout(c, x, y, r, t, t0, fn, px=None, py=None):
 # ---------- character (bust) ----------
 TALK = 0.0   # lo fija el render en cada cuadro según la voz
 OUT = "#120c0e"
+OUTLINE = True   # contorno y sombras (estilo nuevo); False = estilo clásico
 def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", skin="#c48a5c", shirt="#3c8a5a",
          eyebags=0.0, tears=0.0, mustache=False, hair_col="#2a1a14", cap_col="#e8702a", sweat=0.0, talk=0.0, shake=0.0, apron=False, gray=False,
          mole=False, hood=False):
@@ -66,9 +67,9 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     br = math.sin(t * 2.0)
     c.save(); c.translate(0, -br * 3)
     # torso (contorno + sombra)
-    rrect(c, -209, -249, 418, 348, 108, OUT)
+    if OUTLINE: rrect(c, -209, -249, 418, 348, 108, OUT)
     rrect(c, -200, -240, 400, 330, 100, shirt)
-    c.save(); rrect_path(c, -200, -240, 400, 330, 100); c.clip(); ell(c, 170, -60, 150, 260, hx("#000", 0.16)); c.restore()
+    if OUTLINE: c.save(); rrect_path(c, -200, -240, 400, 330, 100); c.clip(); ell(c, 170, -60, 150, 260, hx("#000", 0.16)); c.restore()
     if hood: c.new_path(); c.arc(0, -240, 150, 0, math.pi); fill(c, hx("#000", 0.22)); line(c, [(-40, -200), (-46, -120)], "#d8d8d8", 6); line(c, [(40, -200), (46, -120)], "#d8d8d8", 6)
     if apron: rrect(c, -110, -200, 220, 300, 30, "#f1ece2")
     else:
@@ -94,11 +95,11 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     c.restore()
     # head
     hy = -380 - br * 4
-    rect(c, -42, hy + 96, 84, 70, OUT); rect(c, -34, hy + 100, 68, 60, skin)
-    circ(c, -132, hy + 10, 33, OUT); circ(c, 132, hy + 10, 33, OUT); circ(c, 0, hy, 146, OUT)
+    if OUTLINE: rect(c, -42, hy + 96, 84, 70, OUT); circ(c, -132, hy + 10, 33, OUT); circ(c, 132, hy + 10, 33, OUT); circ(c, 0, hy, 146, OUT)
+    rect(c, -34, hy + 100, 68, 60, skin)
     circ(c, -132, hy + 10, 26, skin); circ(c, 132, hy + 10, 26, skin)
     circ(c, 0, hy, 138, skin)
-    c.save(); c.new_path(); c.arc(0, hy, 138, 0, 2 * math.pi); c.clip(); circ(c, 95, hy + 55, 150, hx("#3a1408", 0.14)); circ(c, -60, hy - 70, 70, hx("#ffffff", 0.07)); c.restore()
+    if OUTLINE: c.save(); c.new_path(); c.arc(0, hy, 138, 0, 2 * math.pi); c.clip(); circ(c, 95, hy + 55, 150, hx("#3a1408", 0.14)); circ(c, -60, hy - 70, 70, hx("#ffffff", 0.07)); c.restore()
     if mole: circ(c, -38, hy + 128, 7, "#3a2216")
     if hat == "beanie":
         c.new_path(); c.arc(0, hy - 12, 146, math.pi * 1.0, math.pi * 2.0); c.close_path(); fill(c, cap_col)

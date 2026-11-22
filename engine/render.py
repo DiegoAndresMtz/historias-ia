@@ -18,6 +18,8 @@ W, H, FPS = 1080, 1920, 30
 PY = 420
 BUILD = f"{STORY}/build/p{PART}"
 D = json.load(open(f"{BUILD}/timeline.json")); TL = D["lines"]; END = D["END"]; AMP = D["amp"]
+CLASSIC = getattr(G, "STYLE", "") == "clasico"   # estilo «Tu IA te hizo rico»: sin cortes duros ni contornos
+povlib.OUTLINE = not CLASSIC
 KEY = G.KEY; FX = getattr(G, "FX", {}); CAM = getattr(G, "CAM", {}); FOCUS = getattr(G, "FOCUS", {})
 FOCUS.update(getattr(PN, "FOCUS", {})); CAM.update(getattr(PN, "CAM", {}))
 
@@ -48,7 +50,7 @@ for i, l in enumerate(TL):
         cycle = [(1.0, 540, 540), (1.32, fx, fy), (1.15, fx + 40, fy - 20)]
         if i % 2: cycle = [cycle[1], cycle[0], cycle[2]]
         sh = [(0.0,) + cycle[0]]
-        if dur > 2.6 and i < len(TL) - 1:
+        if dur > 2.6 and i < len(TL) - 1 and not CLASSIC:
             n = int(dur / 2.1)
             starts = [w[1] - t0 for w in l["words"]]
             for k in range(1, n + 1):
@@ -63,7 +65,7 @@ def camera(scene, t, li):
         if t >= s[0]: cur = s; nxt = sh[k + 1][0] if k + 1 < len(sh) else None
     st = cur[0]; en = nxt if nxt is not None else (bounds[scene][1] - bounds[scene][0]) / FPS
     p = clamp((t - st) / max(0.5, en - st))
-    z = cur[1] * (1 + 0.045 * ease(p))
+    z = cur[1] * (1 + (0.03 if CLASSIC else 0.045) * ease(p))
     # golpe de zoom en palabras clave
     g = bounds[scene][0] / FPS + t
     for x, a, b in TL[li]["words"]:

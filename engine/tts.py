@@ -20,6 +20,8 @@ VOICES = {
     "G": (0.85 * V("em_alex") + 0.15 * V("am_michael"), 0.97, 0.98),
     "M": (V("ef_dora"), 0.92, 0.99),
     "P": (V("em_santa"), 0.9, 0.97),
+    "K": (V("ef_dora"), 1.0, 1.28),                                   # niño/niña
+    "X": (0.6 * V("em_santa") + 0.4 * V("am_onyx"), 0.82, 0.86),     # voz ronca (payaso)
 }
 def chain(pitch):
     return (f"rubberband=pitch={pitch}:formant=preserved,highpass=f=55,equalizer=f=120:t=q:w=1.2:g=3,"

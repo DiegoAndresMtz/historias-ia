@@ -1,6 +1,6 @@
 # «La Remedadora» — terror en 3 partes
 # (escena, voz, texto, pausa). Voces: N narrador, M mamá, G «tu voz» imitada.
-TITLE = ("POV: Tu mamá te pide que le abras", "pero está dormida en su cuarto")
+TITLE = ("Tu mamá te pide que le abras…", "pero está dormida en su cuarto")
 
 PARTS = {
 1: [
