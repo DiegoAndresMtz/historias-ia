@@ -128,3 +128,82 @@ def cara_ventana(c, x, y, s, t, hands=True):
             ell(c, hx0, 60, 70, 90, "#b8b4a8")
             for k in range(4): line(c, [(hx0 + (k - 1.5) * 34, 0), (hx0 + (k - 1.5) * 44, -200)], "#b8b4a8", 22)
     c.restore()
+
+def _veins(c, w, h, seed=11, col="#2a0a3a", n=6):
+    """Venas oscuras que salen de los ojos y del cuello."""
+    r = random.Random(seed)
+    for k in range(n):
+        sx = -1 if k % 2 else 1
+        x, y = sx * w * 0.38 + r.uniform(-10, 10), -h * 0.05; pts = [(x, y)]
+        for _ in range(5): x += sx * r.uniform(4, 22); y += r.uniform(12, 30); pts.append((x, y))
+        line(c, pts, hx(col, 0.75), 4)
+        bx, by = pts[2]; line(c, [(bx, by), (bx + sx * 26, by + 8), (bx + sx * 40, by + 26)], hx(col, 0.55), 3)
+
+def infectado(c, x, y, s, t, open_=0.45, look=(0, 0), hair="long", hair_col="#1a1210", shirt="#5a4a6a",
+              cap_col="#2a3048", bite=True, arm_up=0.0, seed=3, skin="#9aa58a"):
+    """Infectado/a: piel gris verdosa agrietada, venas negras, cuencas negras con pupila amarilla que brilla,
+    boca rasgada con dientes afilados, mordida que sangra en el cuello y tic nervioso."""
+    dx, dy, rot = _twitch(t, seed, 1.5)
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s); c.rotate(rot)
+    # cuerpo con camisa rota
+    poly(c, [(-220, 210), (220, 210), (290, 700), (-290, 700)], shirt)
+    poly(c, [(-220, 210), (-60, 210), (-120, 420)], hx("#000", 0.25))
+    for k in range(5): poly(c, [(-180 + k * 80, 700), (-150 + k * 80, 610), (-120 + k * 80, 700)], hx("#000", 0.35))
+    for k in range(6): ell(c, -150 + k * 60, 300 + (k % 3) * 90, 14, 22, hx("#4a0000", 0.55))   # manchas de sangre
+    if arm_up:
+        a = arm_up
+        line(c, [(200, 260), (300, 260 - 220 * a), (330, 200 - 520 * a)], shirt, 70)
+        cx_, cy_ = 330, 200 - 520 * a
+        circ(c, cx_, cy_, 40, skin)
+        line(c, [(cx_, cy_), (cx_ + 8, cy_ - 110)], skin, 18)            # dedo que señala
+        for k in range(3): line(c, [(cx_ - 30 + k * 14, cy_ + 10), (cx_ - 40 + k * 18, cy_ - 40)], skin, 14)
+    # cuello con mordida
+    rect(c, -60, 160, 120, 90, skin)
+    if bite:
+        ell(c, 34, 200, 40, 26, "#3a0008"); ell(c, 34, 200, 26, 14, "#7a0010")
+        for k in range(5): circ(c, 6 + k * 14, 186 + (k % 2) * 26, 4, "#1a0004")
+        _drip(c, 30, 220, t, "#7a0010", seed); _drip(c, 52, 216, t + 0.4, "#7a0010", seed + 2)
+    # pelo de atrás
+    if hair == "long":
+        r = random.Random(seed)
+        for k in range(30):
+            xx = -200 + k * 14 + r.uniform(-6, 6)
+            line(c, [(xx * 0.8, -200), (xx * 1.05, 40), (xx * 1.15 + r.uniform(-20, 20), 300 + r.uniform(-40, 80))], hair_col, 16)
+    _skull_head(c, 175, 235, skin, "#3a4430")
+    _cracks(c, 175, 235, seed + 4, "#2a0a0a", 10)
+    _veins(c, 175, 235, seed + 7)
+    if hair == "long":
+        c.new_path(); c.arc(0, -150, 170, math.pi * 1.05, math.pi * 1.95); c.close_path(); fill(c, hair_col)
+        r = random.Random(seed + 1)
+        for k in range(9):   # mechones mojados sobre la cara
+            xx = -150 + k * 37
+            line(c, [(xx, -190), (xx + r.uniform(-10, 10), -60 + r.uniform(0, 70))], hair_col, 18)
+    elif hair == "cap":
+        c.new_path(); c.arc(0, -150, 172, math.pi * 1.02, math.pi * 1.98); c.close_path(); fill(c, cap_col)
+        ell(c, 90, -168, 150, 26, hx("#000", 0.3)); ell(c, 90, -174, 150, 26, cap_col)
+        for sx in (-1, 1): rect(c, sx * 150 - 15, -150, 30, 60, "#bdb8b2")   # canas
+    _eyes(c, 175, 235, t, "#d8ff2a", look, 1.05)
+    _grin(c, 175, 235, t, open_, teeth=20, lip="#5a0010", stretch=1.25)
+    for sx in (-1, 1):   # comisuras rasgadas
+        line(c, [(sx * 175 * 0.95, 235 * 0.24), (sx * 175 * 1.1, 235 * 0.16)], "#3a0008", 6)
+    _drip(c, -40, 150, t, "#6a0010", seed + 5); _drip(c, 60, 160, t + 0.7, "#6a0010", seed + 9)
+    c.restore()
+
+def bebe_infectado(c, x, y, s, t, open_=0.5, hand=True):
+    """Bebé infectado asomado en la oscuridad: cabeza grande y calva, piel agrietada,
+    cuencas negras con pupila que brilla y una boca de dientes afilados. Mano chiquita de dedos largos."""
+    dx, dy, rot = _twitch(t, 7, 1.8)
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s); c.rotate(rot + 0.18)
+    _skull_head(c, 160, 170, "#a0a890", "#3a4032")
+    _cracks(c, 160, 170, 21, "#2a0a0a", 9)
+    _veins(c, 160, 170, 23, n=4)
+    _eyes(c, 160, 190, t, "#d8ff2a", (0.4, 0.3), 1.15)
+    _grin(c, 140, 200, t, open_, teeth=14, lip="#5a0010", stretch=1.2)
+    c.restore()
+    if hand:
+        c.save(); c.translate(x + 220 * s, y + 160 * s); c.scale(s, s)
+        ell(c, 0, 0, 46, 38, "#a0a890")
+        for k in range(4): line(c, [(-30 + k * 20, -10), (-50 + k * 30, -90 - (k % 2) * 16)], "#a0a890", 14)
+        for k in range(4): circ(c, -50 + k * 30, -92 - (k % 2) * 16, 6, "#2a1a10")    # uñas negras
+        _cracks(c, 40, 30, 31, "#2a0a0a", 3)
+        c.restore()
