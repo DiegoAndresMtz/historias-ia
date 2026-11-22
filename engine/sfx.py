@@ -58,7 +58,22 @@ def steps():
     for k in range(4):
         i = int(k * 0.5 * SR); m = int(0.12 * SR); s[i:i + m] += lp(rng.normal(0, 1, m), 300) * env(m, 0.002, 0.03) * 2
     return s
-FX = {"pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
+def creak():
+    t = T(1.4); f = 90 + 40 * np.sin(2 * np.pi * 0.7 * t) + 15 * rng.normal(0, 1, len(t)).cumsum() / SR * 30
+    ph = 2 * np.pi * np.cumsum(np.abs(f)) / SR; s = np.sign(np.sin(ph)) * 0.3 + np.sin(ph * 3) * 0.2
+    return bp(s, 200, 2500) * np.sin(np.pi * t / 1.4) * 0.8
+def knock1():
+    m = int(0.18 * SR); return lp(rng.normal(0, 1, m), 400) * env(m, 0.001, 0.035) * 2.5 + np.sin(2 * np.pi * 110 * T(0.18)) * env(m, 0.001, 0.05)
+def knock3():
+    s = np.zeros(int(2.4 * SR))
+    for k in range(3): i = int(k * 0.75 * SR); kk = knock1(); s[i:i + len(kk)] += kk
+    return s
+def lock():
+    a = hp(rng.normal(0, 1, int(0.05 * SR)), 1500) * env(int(0.05 * SR), 0.001, 0.01)
+    s = np.zeros(int(0.3 * SR)); s[:len(a)] += a; s[int(0.12 * SR):int(0.12 * SR) + len(a)] += a * 1.4; return s
+def whisper():
+    t = T(1.6); return bp(rng.normal(0, 1, len(t)), 2000, 7000) * (0.5 + 0.5 * np.sin(2 * np.pi * 5 * t) ** 2) * np.sin(np.pi * t / 1.6) * 0.4
+FX = {"creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
       "heart": lambda: np.concatenate([heart(), heart()]), "doorbell": doorbell, "scrape": scrape, "paper": paper, "steps": steps,
       "riser_end": lambda: riser(1.2, 200, 900) * 0.6}
 

@@ -121,9 +121,11 @@ def captions(c, g):
             x += widths[i] + sp
 
 def label(c):
-    card(c, 80, 150, 920, 190, 26, "#ffffff", 0.25)
-    txt(c, G.TITLE[0], W / 2, 232, "#11131a", 52, True)
-    txt(c, G.TITLE[1], W / 2, 300, "#11131a", 52, True)
+    card(c, 40, 150, 1000, 190, 26, "#ffffff", 0.25)
+    fs = 52
+    while fs > 34 and max(text_w(c, s) for s in G.TITLE if (ui(c, fs) or True)) > 930: fs -= 2
+    txt(c, G.TITLE[0], W / 2, 232, "#11131a", fs, True)
+    txt(c, G.TITLE[1], W / 2, 300, "#11131a", fs, True)
     tg = f"PARTE {PART}" + (" · FINAL" if PART == 3 else "")
     ui(c, 30); tw = text_w(c, tg)
     rrect(c, W / 2 - tw / 2 - 22, 118, tw + 44, 50, 25, "#e0303a"); txt(c, tg, W / 2, 154, "#ffffff", 30, True)
@@ -235,7 +237,9 @@ def render_scene(name):
 
 if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
-    if sys.argv[3] == "stills":
+    if sys.argv[3] == "label":   # tarjeta del título sola (para corregirla sin volver a renderizar)
+        surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H); label(cairo.Context(surf)); surf.write_to_png(f"{BUILD}/label.png")
+    elif sys.argv[3] == "stills":
         surf = cairo.ImageSurface(cairo.FORMAT_ARGB32, W, H)
         for ts in sys.argv[4:]:
             fi = int(float(ts) * FPS) if not ts[0].isalpha() else bounds[ts.split("+")[0]][0] + int(float(ts.split("+")[1] if "+" in ts else 0.5) * FPS)
@@ -243,7 +247,7 @@ if __name__ == "__main__":
             surf.write_to_png(f"{OUT}/st_{ts}.png")
     elif sys.argv[3] == "render":
         from multiprocessing import Pool
-        names = sys.argv[5:] or list(bounds)
+        names = sys.argv[5:] or [n for n in bounds if not os.path.exists(f"{OUT}/{n}.mp4")]   # retoma lo que falte
         names.sort(key=lambda n: -(bounds[n][1] - bounds[n][0]))
         with Pool(int(sys.argv[4])) as pool:
             for r in pool.imap_unordered(render_scene, names): print(r, flush=True)

@@ -128,6 +128,10 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     if mood in ("happy", "proud"):
         for sx in (-ex, ex):
             c.new_path(); c.arc(sx, ey + 10, 30, math.pi * 1.15, math.pi * 1.85); c.set_line_width(10); c.set_line_cap(cairo.LINE_CAP_ROUND); src(c, "#1a1110"); c.stroke()
+    elif mood == "creepy":
+        for sx in (-ex, ex):
+            circ(c, sx, ey, 48, "#f4f4ec"); circ(c, sx + look[0] * 8, ey + look[1] * 8, 7, "#0a0a0a")
+            c.new_path(); c.arc(sx, ey, 48, 0, 2 * math.pi); c.set_line_width(3); src(c, hx("#5a1a1a", 0.5)); c.stroke()
     else:
         for sx in (-ex, ex):
             circ(c, sx, ey, 40, "#ffffff")
@@ -149,7 +153,10 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     ell(c, 0, ey + 44, 12, 9, hx("#8a5a3a", 0.5))
     if mustache: poly(c, [(-60, ey + 66), (0, ey + 52), (60, ey + 66), (46, ey + 82), (0, ey + 70), (-46, ey + 82)], "#3a2a20" if not gray else "#cfc9c0")
     my = ey + 92
-    if talk > 0.08: ell(c, 0, my, 22 + 8 * talk, 5 + 22 * talk, "#4a1212"); ell(c, 0, my + 10 * talk, 12 + 4 * talk, 4 + 6 * talk, hx("#e86a6a", 0.8))
+    if mood == "creepy" and talk <= 0.08:
+        c.new_path(); c.move_to(-82, my - 22); c.curve_to(-50, my + 36, 50, my + 36, 82, my - 22); c.curve_to(40, my + 6, -40, my + 6, -82, my - 22); fill(c, "#2a0808")
+        for k in range(-60, 70, 20): line(c, [(k, my - 2), (k, my + 12)], hx("#f4f0e0", 0.9), 5)
+    elif talk > 0.08: ell(c, 0, my, 22 + 8 * talk, 5 + 22 * talk, "#4a1212"); ell(c, 0, my + 10 * talk, 12 + 4 * talk, 4 + 6 * talk, hx("#e86a6a", 0.8))
     elif mood == "happy": c.new_path(); c.move_to(-50, my - 10); c.curve_to(-30, my + 40, 30, my + 40, 50, my - 10); c.close_path(); fill(c, "#5a1a1a"); ell(c, 0, my + 14, 20, 8, "#e86a6a")
     elif mood in ("smile", "proud"): c.new_path(); c.arc(0, my - 30, 44, math.pi * 0.2, math.pi * 0.8); c.set_line_width(9); src(c, "#3a1a12"); c.stroke()
     elif mood == "shock": ell(c, 0, my + 6, 22, 30, "#3a0f0c")
