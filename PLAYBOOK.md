@@ -21,7 +21,7 @@ bash setup.sh     # librerías, voz Kokoro (GitHub releases) y fuentes
 - `TITLE`: 2 líneas, **sin «POV»**, con la palabra clave del miedo.
 - Narración en segunda persona («tú»), con calma y detalle; cada detalle cuenta y se paga después.
 - **Gancho en la primera frase** (empieza en el momento más fuerte), giros, cliffhanger al final de las partes 1 y 2.
-- 3 partes de **80–90 s** cada una.
+- 3 partes de **80–90 s** cada una; partes 2+3 juntas ≤ 178 s (Short de YouTube).
 - Última línea de cada parte: «¿Qué haces? Opción A: … Opción B: … Comenta A o B. Y sígueme, que la parte dos sale hoy / el final sale hoy / si quieres la segunda temporada, sígueme.»
 - Voces: N narrador, M mamá/mujer, P papá/hombre mayor, K niño/niña, X voz ronca de monstruo, G voz «gemela» del protagonista.
 - Llena `KEY`, `ENDCARD`, `FX` (flash/shake/red), `CUES` (boom, boom_s, heart, ping, pop, creak, knock3, steps, paper, whisper, doorbell, scrape, lock, riser_end), `MUSIC` (tense/dark/piano).
@@ -39,7 +39,7 @@ for p in 1 2 3; do python3 engine/tts.py stories/<slug> $p; done
 python3 engine/render.py stories/<slug> 1 stills a01+2 a05+3 ...   # mira los PNG antes de renderizar
 timeout 560 python3 engine/render.py stories/<slug> <parte> render 2   # si se corta, vuelve a correrlo: retoma lo que falte
 bash engine/final.sh stories/<slug> <parte> videos/<fecha>/<slug>_p<parte>.mp4
-# YouTube: une las 3 partes con concat -c copy -> videos/<fecha>/<slug>_completa_youtube.mp4
+# YouTube: une partes 2 y 3 con concat -c copy -> videos/<fecha>/<slug>_p2y3_youtube.mp4 (≤ 178 s)
 ```
 Revisa cuadros del video final (ffmpeg -ss … -frames:v 1) antes de publicar.
 
@@ -56,7 +56,11 @@ Horario (hora Colombia, `mode: customScheduled`, `schedulingType: automatic`):
 - Lunes a viernes: Parte 1 12:30 p. m. · Parte 2 7:00 p. m. · Parte 3 9:30 p. m.
 - Sábado y domingo: Parte 1 11:00 a. m. · Parte 2 7:00 p. m. · Parte 3 9:30 p. m.
 - TikTok e Instagram: las 3 partes.
-- YouTube: **un solo video al día**, la historia completa (las 3 partes unidas), a las **9:45 p. m.** Buffer rechaza un tercer video de YouTube dentro de 24 horas, así que nunca programes más de uno por día en YouTube.
+- YouTube: **un solo Short al día, a las 9:45 p. m.** (Buffer rechaza un tercer video de YouTube dentro de 24 horas y no acepta videos de más de 3 min).
+  YouTube va intercalado: mira qué video de YouTube quedó programado el día anterior.
+  · Si fue la **Parte 1** de una historia → ese día va el `_p2y3_youtube.mp4` de ESA misma historia (título «… (Partes 2 y 3 FINAL)»).
+  · Si fue un final (o no hay nada) → ese día va la **Parte 1** de la historia nueva del día (texto: «Parte 1. El final sale mañana»).
+  Así YouTube publica una historia completa cada 2 días; las historias intermedias solo salen en TikTok e Instagram.
 - Descripción: gancho de 1 línea + «Parte N de 3. ¿A o B? 👇» + 5 hashtags (#historiasdeterror #terror #miedo + 1 del tema + #historiasvarias; en YouTube #shorts primero).
 - El plan gratis de Buffer permite 10 publicaciones en cola por canal: no programes más de 2 días adelante.
 - Nunca pidas ni uses contraseñas; solo Buffer.
