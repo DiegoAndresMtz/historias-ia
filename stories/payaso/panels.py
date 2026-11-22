@@ -13,21 +13,13 @@ MAMA = dict(hat="bun", skin="#d8a882", shirt="#8a2a4a", hair_col="#4a2a1a")
 GUARD = dict(hat="cap", skin="#a8704a", shirt="#4a5a7a", cap_col="#2a3048", mustache=True)
 FOCUS = {}; CAM = {}
 
+import monstruos as M
 def clown(c, x, y, s, t, mood="creepy", wet=0.0, sit=True, a=1.0):
-    def f():
-        c.push_group()
-        bust(c, 0, 0, 1.0, t * 0.15, mood, look=(0, 0), hat="none", skin="#f2efe6", shirt="#6a2a8a", hair_col="#f2efe6")
-        hy = -380
-        for sx in (-1, 1):
-            for k in range(3): circ(c, sx * (150 + k * 14), hy - 40 + k * 40, 44, "#e8402a")
-        for sx in (-54, 54): poly(c, [(sx, hy - 60), (sx + 16, hy + 4), (sx, hy + 66), (sx - 16, hy + 4)], hx("#2a3a8a", 0.55))
-        circ(c, 0, hy + 46, 26, "#e0201a"); circ(c, -8, hy + 38, 8, hx("#ffffff", 0.6))
-        for k in range(7): circ(c, -150 + k * 50, -230, 36, "#f4f0e8")
-        for k in range(3): circ(c, 0, -140 + k * 70, 14, "#e8402a")
-        if wet:
-            for sx in (-54, 54): ell(c, sx + 8, hy + 60 + (t * 40 % 60), 8, 14, hx("#9fdcff", 0.8 * wet))
-        c.pop_group_to_source(); c.paint_with_alpha(a)
-    scaled(c, x, y, s, f)
+    """Payaso nuevo (monstruos.payaso_malo), ubicado y escalado como el anterior."""
+    if a <= 0.01: return
+    if a < 1: c.push_group()
+    M.payaso_malo(c, x, y - 380 * s, s * 0.69, t, open_=0.35)
+    if a < 1: c.pop_group_to_source(); c.paint_with_alpha(a)
 
 def sala(c, t, statue=1.0, dent=0.0, tv=True, dark=0.0, you=None):
     vgrad(c, 0, 0, P, P, "#2c3350", "#1b2036")

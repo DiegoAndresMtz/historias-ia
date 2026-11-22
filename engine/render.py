@@ -20,6 +20,7 @@ BUILD = f"{STORY}/build/p{PART}"
 D = json.load(open(f"{BUILD}/timeline.json")); TL = D["lines"]; END = D["END"]; AMP = D["amp"]
 CLASSIC = getattr(G, "STYLE", "") == "clasico"   # estilo «Tu IA te hizo rico»: sin cortes duros ni contornos
 povlib.OUTLINE = not CLASSIC
+povlib.APPEAL = CLASSIC or getattr(G, "APPEAL", False)
 KEY = G.KEY; FX = getattr(G, "FX", {}); CAM = getattr(G, "CAM", {}); FOCUS = getattr(G, "FOCUS", {})
 FOCUS.update(getattr(PN, "FOCUS", {})); CAM.update(getattr(PN, "CAM", {}))
 

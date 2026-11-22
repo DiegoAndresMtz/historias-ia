@@ -57,10 +57,11 @@ def callout(c, x, y, r, t, t0, fn, px=None, py=None):
 # ---------- character (bust) ----------
 TALK = 0.0   # lo fija el render en cada cuadro según la voz
 OUT = "#120c0e"
+APPEAL = False   # estilo «que enamore»: ojos con iris y brillos, cachetes, pestañas, cejas suaves
 OUTLINE = True   # contorno y sombras (estilo nuevo); False = estilo clásico
 def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", skin="#c48a5c", shirt="#3c8a5a",
          eyebags=0.0, tears=0.0, mustache=False, hair_col="#2a1a14", cap_col="#e8702a", sweat=0.0, talk=0.0, shake=0.0, apron=False, gray=False,
-         mole=False, hood=False):
+         mole=False, hood=False, eye_col="#6a3a1a", lashes=None):
     if talk == "auto": talk = TALK
     c.save(); c.translate(x, y); c.scale(s, s)
     if shake: c.translate(math.sin(t * 60) * 4 * shake, math.cos(t * 47) * 2 * shake)
@@ -98,6 +99,7 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     if OUTLINE: rect(c, -42, hy + 96, 84, 70, OUT); circ(c, -132, hy + 10, 33, OUT); circ(c, 132, hy + 10, 33, OUT); circ(c, 0, hy, 146, OUT)
     rect(c, -34, hy + 100, 68, 60, skin)
     circ(c, -132, hy + 10, 26, skin); circ(c, 132, hy + 10, 26, skin)
+    if APPEAL: ell(c, -134, hy + 12, 11, 15, hx("#7a3a20", 0.22)); ell(c, 134, hy + 12, 11, 15, hx("#7a3a20", 0.22))
     circ(c, 0, hy, 138, skin)
     if OUTLINE: c.save(); c.new_path(); c.arc(0, hy, 138, 0, 2 * math.pi); c.clip(); circ(c, 95, hy + 55, 150, hx("#3a1408", 0.14)); circ(c, -60, hy - 70, 70, hx("#ffffff", 0.07)); c.restore()
     if mole: circ(c, -38, hy + 128, 7, "#3a2216")
@@ -123,6 +125,9 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
         for k in (-90, -30, 30, 90): poly(c, [(k - 30, hy - 120), (k, hy - 170), (k + 30, hy - 120)], hair_col)
     else:
         c.new_path(); c.arc(0, hy - 10, 144, math.pi * 1.05, math.pi * 1.95); c.close_path(); fill(c, hair_col)
+    if APPEAL and hat in ("hair", "bun", "none"):
+        c.new_path(); c.arc(-20, hy - 40, 100, math.pi * 1.15, math.pi * 1.45); c.set_line_width(14); c.set_line_cap(cairo.LINE_CAP_ROUND); src(c, hx("#ffffff", 0.16)); c.stroke()
+    if lashes is None: lashes = hat == "bun"
     # face
     ex = 54; ey = hy + 4
     blink = (t % 4.3) < 0.12
@@ -135,8 +140,24 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
             c.new_path(); c.arc(sx, ey, 48, 0, 2 * math.pi); c.set_line_width(3); src(c, hx("#5a1a1a", 0.5)); c.stroke()
     else:
         for sx in (-ex, ex):
-            circ(c, sx, ey, 40, "#ffffff")
-            if blink and mood != "shock": rect(c, sx - 42, ey - 42, 84, 84, skin); line(c, [(sx - 30, ey + 4), (sx + 30, ey + 4)], "#1a1110", 7)
+            if APPEAL: ell(c, sx, ey, 40, 47, "#ffffff")
+            else: circ(c, sx, ey, 40, "#ffffff")
+            if blink and mood != "shock":
+                rect(c, sx - 44, ey - 50, 88, 100, skin)
+                if APPEAL: c.new_path(); c.arc(sx, ey - 6, 30, math.pi * 0.15, math.pi * 0.85); c.set_line_width(7); src(c, "#1a1110"); c.stroke()
+                else: line(c, [(sx - 30, ey + 4), (sx + 30, ey + 4)], "#1a1110", 7)
+            elif APPEAL:
+                ir = 14 if mood == "shock" else 25
+                px, py = sx + look[0] * 13, ey + 3 + look[1] * 13
+                circ(c, px, py, ir, eye_col); circ(c, px, py + ir * 0.25, ir * 0.7, hx("#000000", 0.18))
+                circ(c, px, py, ir * 0.52, "#120806")
+                circ(c, px - ir * 0.36, py - ir * 0.38, ir * 0.36, "#ffffff"); circ(c, px + ir * 0.36, py + ir * 0.4, ir * 0.15, "#ffffff")
+                c.new_path(); c.arc(sx, ey + 6, 45, math.pi * 1.13, math.pi * 1.87); c.set_line_width(8); c.set_line_cap(cairo.LINE_CAP_ROUND); src(c, "#1a1110"); c.stroke()
+                if lashes:
+                    o = 1 if sx > 0 else -1
+                    for k in range(3): line(c, [(sx + o * (30 + k * 6), ey - 26 + k * 10), (sx + o * (44 + k * 9), ey - 38 + k * 8)], "#1a1110", 5)
+                if mood == "tired":
+                    c.new_path(); c.rectangle(sx - 44, ey - 50, 88, 46); fill(c, skin); line(c, [(sx - 36, ey - 4), (sx + 36, ey - 4)], "#1a1110", 6)
             else:
                 pr = 9 if mood == "shock" else 18
                 px, py = sx + look[0] * 14, ey + look[1] * 14
@@ -149,9 +170,10 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     # brows
     bw = {"shock": (-20, 16), "sad": (-6, 10), "worry": (-4, 12), "angry": (10, -8)}.get(mood, (0, 0))
     for sx in (-1, 1):
-        line(c, [(sx * (ex + 32), ey - 58 + bw[0] * 0.3), (sx * (ex - 26), ey - 62 - bw[1])], "#2a1a14" if not gray else "#8e8a86", 9)
+        line(c, [(sx * (ex + 32), ey - 62 + bw[0] * 0.3), (sx * (ex - 26), ey - 66 - bw[1])], ("#2a1a14" if not gray else "#8e8a86"), 12 if APPEAL else 9)
     # nose
-    ell(c, 0, ey + 44, 12, 9, hx("#8a5a3a", 0.5))
+    if APPEAL: c.new_path(); c.arc(0, ey + 36, 13, math.pi * 0.2, math.pi * 0.8); c.set_line_width(6); src(c, hx("#7a4a2a", 0.55)); c.stroke()
+    else: ell(c, 0, ey + 44, 12, 9, hx("#8a5a3a", 0.5))
     if mustache: poly(c, [(-60, ey + 66), (0, ey + 52), (60, ey + 66), (46, ey + 82), (0, ey + 70), (-46, ey + 82)], "#3a2a20" if not gray else "#cfc9c0")
     my = ey + 92
     if mood == "creepy" and talk <= 0.08:
@@ -162,7 +184,9 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     elif mood in ("smile", "proud"): c.new_path(); c.arc(0, my - 30, 44, math.pi * 0.2, math.pi * 0.8); c.set_line_width(9); src(c, "#3a1a12"); c.stroke()
     elif mood == "shock": ell(c, 0, my + 6, 22, 30, "#3a0f0c")
     elif mood in ("sad", "worry"): c.new_path(); c.arc(0, my + 30, 36, math.pi * 1.2, math.pi * 1.8); c.set_line_width(8); src(c, "#3a1a12"); c.stroke()
+    elif APPEAL: c.new_path(); c.arc(0, my - 22, 28, math.pi * 0.28, math.pi * 0.72); c.set_line_width(7); src(c, "#3a1a12"); c.stroke()
     else: line(c, [(-26, my), (26, my)], "#3a1a12", 8)
+    if APPEAL and mood not in ("happy", "proud", "smile", "creepy"): ell(c, -92, ey + 48, 24, 13, hx("#ff7a8a", 0.25)); ell(c, 92, ey + 48, 24, 13, hx("#ff7a8a", 0.25))
     if mood in ("happy", "proud", "smile"): ell(c, -92, ey + 46, 24, 14, hx("#ff7a8a", 0.4)); ell(c, 92, ey + 46, 24, 14, hx("#ff7a8a", 0.4))
     if tears > 0:
         for sx in (-ex, ex):
