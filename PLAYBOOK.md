@@ -16,6 +16,17 @@ bash setup.sh     # librerías, voz Kokoro (GitHub releases) y fuentes
   propia, ambientada en Colombia, con giro final nuevo. Las leyendas populares (Llorona, Silbón, la niñera y el payaso…) son folclor.
 - No repitas una historia que ya esté en `stories/`.
 
+## 1b. Formato «Ruleta de leyendas» (el formato de la cuenta desde el 24-nov)
+- Gira la ruleta DE VERDAD al azar: `python3 -c "import secrets;print(secrets.randbelow(8))"` → índice en `engine/leyendas.py` (LEYENDAS).
+  Si sale una leyenda usada en las últimas 4 historias (mira `stories/*/guion.py`, campo RULETA), vuelve a girar.
+- `guion.py` lleva `RULETA = {"scene": "<primera escena>", "start": 0.4, "dur": 6.2, "target": <índice>}` y
+  `TITLE = ("Ruleta de leyendas de miedo:", "la que salga, te la cuento")`.
+- Parte 1: primera línea «Gira la ruleta de leyendas. La que salga, te cuento su historia. Y te advierto: ninguna termina bien.»
+  (la escena dibuja `L.ruleta(...)`, ver `stories/tunda/panels.py`), segunda línea el nombre de la leyenda con la cara grande (`L.icono`).
+- La historia es sobre ESA leyenda (versión propia, ambientada en Colombia, con detalles reales de la leyenda) y **termina en tragedia**.
+- El monstruo debe dar MUCHO miedo: usa `L.icono(...)` para los primeros planos y crea su cuerpo entero en `engine/leyendas.py`
+  (como `L.tunda`) si aún no existe. Final de la Parte 3: «Y sígueme, que la ruleta vuelve a girar.»
+
 ## 2. Guion (`stories/<slug>/guion.py`, copia la estructura de `stories/payaso/guion.py`)
 - `STYLE = "clasico"` (estilo «Tu IA te hizo rico»: protagonista de gorro naranja, colores planos, cámara suave).
 - `TITLE`: 2 líneas, **sin «POV»**, con la palabra clave del miedo.

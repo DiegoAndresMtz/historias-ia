@@ -85,6 +85,14 @@ for sc, lst in getattr(G, "CUES", {}).items():
         if kind == "riser_end": add(FX[kind](), tw - 1.2, g, 0.4)
         else: add(FX[kind](), tw - (0.05 if kind.startswith("boom") else 0.1), g, 0.4 if kind.startswith("boom") else 0.2)
         if kind == "boom" and g >= 0.9: hits.append(tw)
+# ruleta de leyendas: un clic cada vez que el puntero cruza una porción
+if getattr(G, "RULETA", None) and G.RULETA["scene"] in IDX:
+    import os as _os; sys.path.insert(0, _os.path.dirname(_os.path.abspath(__file__)))
+    import leyendas
+    R_ = G.RULETA; t0 = S(R_["scene"]) - 0.35 + R_["start"] if IDX[R_["scene"]] else R_["start"]
+    m = int(0.03 * SR); clk = hp(rng.normal(0, 1, m), 2000) * env(m, 0.0005, 0.006) * 1.2 + np.sin(2 * np.pi * 1800 * T(0.03)) * env(m, 0.0005, 0.01) * 0.6
+    for tk in leyendas.ticks(R_["dur"], R_["target"]): add(clk, t0 + tk, 0.55, 0.05)
+    add(riser(R_["dur"], 120, 700) * 0.5, t0, 0.5, 0.3)
 # golpe inicial (gancho) + transiciones suaves entre escenas
 add(boom(2.2, 55) * 0.8, 0.0, 0.9, 0.5); add(whoosh(0.4), 0.0, 0.4)
 for l in TL[1:]: add(whoosh(0.35), l["start"] - 0.3, 0.18, 0.1)
