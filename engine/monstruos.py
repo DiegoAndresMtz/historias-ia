@@ -207,3 +207,75 @@ def bebe_infectado(c, x, y, s, t, open_=0.5, hand=True):
         for k in range(4): circ(c, -50 + k * 30, -92 - (k % 2) * 16, 6, "#2a1a10")    # uñas negras
         _cracks(c, 40, 30, 31, "#2a0a0a", 3)
         c.restore()
+
+def pasajero(c, x, y, s, t, open_=0.45, look=(0, 0), bend=0.0, arms=0.0, beanie=False, body=True, seed=13):
+    """El Pasajero: altísimo y flaco, piel gris de papel mojado y agrietada, cuello largo que se dobla,
+    cuencas negras con pupila celeste que brilla, sonrisa de oreja a oreja con dientes afilados,
+    dedos larguísimos y tic nervioso. (x, y) = centro de la cabeza; el cuerpo baja ~1100 px.
+    bend: ladea la cabeza (radianes). arms: 0 brazos colgando, 1 manos arriba, cerca de la cara."""
+    dx, dy, rot = _twitch(t, seed, 1.6)
+    skin, dark = "#a7aca6", "#3c423c"
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    sw = math.sin(t * 1.1) * 10
+    if body:
+        # torso esquelético con costillas
+        line(c, [(0, 150), (0, 330)], skin, 70)                                   # cuello largo
+        poly(c, [(-150, 320), (150, 320), (110, 900), (-110, 900)], "#0a0b0c")
+        poly(c, [(-130, 330), (130, 330), (96, 760), (-96, 760)], hx(skin, 0.95))
+        for k in range(6):
+            yy = 400 + k * 52
+            c.new_path(); c.move_to(-110 + k * 4, yy); c.curve_to(-40, yy + 26, 40, yy + 26, 110 - k * 4, yy)
+            c.set_line_width(9); src(c, hx(dark, 0.8)); c.stroke()
+        line(c, [(0, 340), (0, 740)], hx(dark, 0.6), 8)
+        c.save(); c.translate(0, 560); _cracks(c, 90, 170, seed + 2, "#2a1a1a", 6); c.restore()
+        for sx in (-1, 1):
+            if arms > 0:
+                hx_, hy_ = sx * (150 + 40 * (1 - arms)), 120 - 260 * arms
+                line(c, [(sx * 130, 350), (sx * (260 + sw * 0.3), 330 - 80 * arms), (hx_ + sx * 30, hy_ + 40)], skin, 34)
+                bx, by = hx_ + sx * 30, hy_ + 40
+            else:
+                line(c, [(sx * 130, 350), (sx * (220 + sw), 680), (sx * (250 + sw), 1040)], skin, 34)
+                bx, by = sx * (250 + sw), 1040
+            ell(c, bx, by, 34, 40, skin)
+            base = -math.pi / 2 if arms > 0 else math.pi / 2
+            for k in range(4):   # dedos larguísimos con uñas negras
+                ang = base + (-0.45 + k * 0.3) * sx
+                fx_, fy_ = bx + math.cos(ang) * 200, by + math.sin(ang) * 200
+                mx_, my_ = bx + math.cos(ang + 0.25 * sx) * 105, by + math.sin(ang + 0.25 * sx) * 105
+                line(c, [(bx, by), (mx_, my_), (fx_, fy_)], skin, 12)
+                circ(c, fx_, fy_, 7, "#120a0a")
+    c.rotate(rot + bend)
+    _skull_head(c, 150, 215, skin, dark)
+    _cracks(c, 95, 150, seed, "#2a1414", 9)
+    _veins(c, 150, 215, seed + 5, "#1a1428", 6)
+    _eyes(c, 150, 215, t, "#9af0ff", look, 1.3)
+    _grin(c, 150, 215, t, open_, teeth=24, lip="#4a0a10", stretch=1.35)
+    for sx in (-1, 1):   # comisuras rasgadas hasta las orejas
+        line(c, [(sx * 150 * 1.0, 215 * 0.26), (sx * 150 * 1.22, 215 * 0.02)], "#3a0008", 7)
+    _drip(c, -50, 180, t, "#5a0010", seed + 1); _drip(c, 70, 190, t + 0.6, "#5a0010", seed + 3)
+    if beanie:   # tu gorro naranja, robado
+        c.new_path(); c.arc(0, -150, 150, math.pi, 2 * math.pi); c.close_path(); fill(c, "#e8702a")
+        rrect(c, -158, -178, 316, 52, 22, "#c95a1c"); circ(c, 0, -306, 26, "#f2a15a")
+    c.restore()
+
+def pasajero_gatea(c, x, y, s, t, open_=0.6, seed=17):
+    """El Pasajero corriendo en cuatro patas: cuerpo bajo y estirado, extremidades de araña."""
+    dx, dy, rot = _twitch(t, seed, 1.2)
+    skin = "#a7aca6"
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    ph = t * 14
+    ell(c, 0, 0, 260, 70, skin); ell(c, 0, 20, 220, 40, hx("#3c423c", 0.5))
+    for k in range(4):   # patas de araña
+        bx = -200 + k * 130; up = math.sin(ph + k * 1.7)
+        kx, ky = bx - 70 + 40 * up, -120 - 30 * up
+        fx_ = bx + 50 + 60 * up
+        line(c, [(bx, 0), (kx, ky), (fx_, 190)], skin, 26)
+        for j in range(3): line(c, [(fx_, 190), (fx_ + 20 + j * 22, 220)], skin, 8)
+    line(c, [(220, -10), (310, -60)], skin, 50)
+    c.save(); c.translate(330, -90); c.rotate(0.15 + rot)
+    _skull_head(c, 120, 170, skin, "#3c423c")
+    _cracks(c, 80, 120, seed, "#2a1414", 7)
+    _eyes(c, 120, 170, t, "#9af0ff", (0.6, 0), 1.3)
+    _grin(c, 120, 170, t, open_, teeth=18, lip="#4a0a10", stretch=1.35)
+    c.restore()
+    c.restore()
