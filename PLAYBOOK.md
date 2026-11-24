@@ -33,7 +33,9 @@ bash setup.sh     # librerías, voz Kokoro (GitHub releases) y fuentes
 - Narración en segunda persona («tú»), con calma y detalle; cada detalle cuenta y se paga después.
 - **Gancho en la primera frase** (empieza en el momento más fuerte), giros, cliffhanger al final de las partes 1 y 2.
 - 3 partes de **80–90 s** cada una; partes 2+3 juntas ≤ 178 s (Short de YouTube).
-- Última línea de cada parte: «¿Qué haces? Opción A: … Opción B: … Comenta A o B. Y sígueme, que la parte dos sale hoy / el final sale hoy / si quieres la segunda temporada, sígueme.»
+- Última línea de P1 y P2: «¿Qué haces? Opción A: … Opción B: … Comenta A o B. Y sígueme, que la parte dos sale hoy / el final sale hoy.»
+- **FINAL CERRADO OBLIGATORIO (orden de Diego): NO hay segundas temporadas.** La Parte 3 resuelve TODO: qué le pasó al protagonista, al monstruo y a los secundarios; nada de cliffhanger ni «continuará». Prohibido escribir «segunda temporada», «2.ª temporada» o «parte 4» en guion o ENDCARD.
+- Última línea de P3: «¿Y tú qué hubieras hecho? Opción A: … Opción B: … Comenta A o B. Y sígueme para más historias de terror.» (en ruleta: «Y sígueme, que la ruleta vuelve a girar.»). ENDCARD[3] = ("¿QUÉ HUBIERAS HECHO?", A, B, "SÍGUEME PARA MÁS TERROR").
 - Voces: N narrador, M mamá/mujer, P papá/hombre mayor, K niño/niña, X voz ronca de monstruo, G voz «gemela» del protagonista.
 - Llena `KEY`, `ENDCARD`, `FX` (flash/shake/red), `CUES` (boom, boom_s, heart, ping, pop, creak, knock3, steps, paper, whisper, doorbell, scrape, lock, riser_end), `MUSIC` (tense/dark/piano).
 

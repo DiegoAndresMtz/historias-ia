@@ -56,7 +56,11 @@ PARTS = {
  ("i11", "G", "Si usted paró, no se baje del carro.", 0.8),
  ("i12", "N", "Le gritas al patrullero que no se baje. Pero ya se bajó. Y desde el monte, alguien lo llama. Con tu voz:", 0.3),
  ("i13", "G", "Mi cabo, venga. Aquí estoy. Tengo mucho frío.", 1.2),
- ("i14", "N", "¿Qué haces? Opción A: te bajas a detenerlo. Opción B: te quedas adentro con el seguro puesto. Comenta A o B. Y si quieres la segunda temporada, sígueme.", 2.0),
+ ("i14", "N", "El patrullero camina hacia el monte, siguiendo tu voz. Tú te quedas en la patrulla con el seguro puesto, gritándole que se devuelva.", 0.4),
+ ("i15", "N", "Se mete entre los eucaliptos. Los grillos se callan. Y no vuelve a salir.", 0.8),
+ ("i16", "N", "Lo buscaron con perros durante una semana. Solo encontraron su gorra, colgada en una rama, a tres metros del piso.", 0.6),
+ ("i17", "N", "Desde ese día, la Policía cerró el cruce. Y en el letrero de la entrada alguien pintó una frase con tu letra: si usted paró, no se baje del carro.", 1.0),
+ ("i18", "N", "¿Y tú qué hubieras hecho? Opción A: bajarte a detenerlo. Opción B: quedarte adentro con el seguro puesto. Comenta A o B. Y sígueme para más historias de terror.", 2.0),
 ],
 }
 
@@ -72,10 +76,11 @@ KEY = {"una", "mañana", "carro", "atravesado", "cruce", "prendido", "encendidas
 ENDCARD = {
  1: ("¿QUÉ HACES?", "Te subes al carro abandonado y arrancas", "Corres al monte a buscar a la niña", "PARTE 2 HOY · SÍGUEME"),
  2: ("¿QUÉ HACES?", "Sigues manejando hasta el pueblo", "Frenas y la bajas del carro", "EL FINAL SALE HOY · SÍGUEME"),
- 3: ("¿QUÉ HACES?", "Te bajas a detenerlo", "Te quedas adentro con el seguro", "¿2.ª TEMPORADA? · SÍGUEME"),
+ 3: ("¿QUÉ HUBIERAS HECHO?", "Bajarte a detenerlo", "Quedarte con el seguro puesto", "SÍGUEME PARA MÁS TERROR"),
 }
 
 FX = {
+ "i15": [("salir", "red")], "i16": [("gorra", "flash"), ("metros", "shake")], "i17": [("letra", "red")],
  "g01": [("nadie", "red")], "g03": [("callan", "shake")], "g04": [("amarrado", "red")], "g05": [("humo", "flash")],
  "g08": [("imita", "red")], "g09": [("bajaste", "flash"), ("bajaste", "shake")], "g11": [("frío", "red")],
  "g12": [("sola", "shake")], "g13": [("luz", "flash")], "g14": [("alto", "red"), ("techo", "shake")],
@@ -87,6 +92,7 @@ FX = {
  "i12": [("bajó", "flash"), ("voz", "shake"), ("voz", "red")], "i13": [("frío", "red")],
 }
 CUES = {
+ "i15": [("callan", "boom_s", 0.8)], "i16": [("gorra", "boom", 1.1)], "i17": [("letra", "boom_s", 0.9)],
  "g01": [("carro", "boom_s", 0.8), ("nadie", "boom", 1.1)], "g02": [("señal", "ping", 0.4)], "g03": [("pitas", "ping", 0.5), ("callan", "boom_s", 0.9)],
  "g04": [("abierta", "creak", 0.8), ("amarrado", "heart", 0.8)], "g05": [("humo", "boom_s", 0.8)], "g06": [("rosada", "heart", 0.6)],
  "g07": [("papelito", "paper", 0.7)], "g08": [("imita", "boom", 1.1)], "g09": [("bajaste", "boom", 1.2)],

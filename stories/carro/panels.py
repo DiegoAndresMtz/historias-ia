@@ -690,7 +690,47 @@ FOCUS["i13"] = (520, 460)
 CAM["i13"] = [("frío", 1.25, 520, 440)]
 
 def i14(c, t, T, w):
-    bosque(c, 0.0, dawn=1.0, who=lambda c_: M.pasajero(c_, 520, 420, 0.75, 0.3, open_=0.8, arms=1.0, beanie=True))
-    overlay(c, "#000", 0.6)
+    walk = ease(clamp(t / T))
+    def out(c_):
+        sc = 0.3 - 0.18 * walk
+        bust(c_, 700 + 160 * walk, 520 + 380 * sc, sc, t, "neutral", look=(0.6, -0.2), **PATRU)
+        line(c_, [(930, 700), (940, 100)], "#1c2418", 70)
+    ventana(c, t, out, dawn=1.0, knock=0.6 * abs(math.sin(t * 7)))
+    c.save(); c.rectangle(0, 0, 460, P); c.clip(); bust(c, 230, 860, 0.8, t, "angry", look=(1, -0.2), talk=0.7 * abs(math.sin(t * 11)), **YOU); c.restore()
+FOCUS["i14"] = (640, 520)
+
+def i15(c, t, T, w):
+    bosque(c, t, dawn=1.0, who=lambda c_: None)
+    overlay(c, "#000", 0.15 * clamp((t - w("callan")) / 0.5))
+    tag2(c, 540, 900, "NUNCA VOLVIÓ", t, w("salir"), "#e0303a", "#ffffff")
+FOCUS["i15"] = (540, 520)
+
+def i16(c, t, T, w):
+    bosque(c, t, dawn=1.0, who=lambda c_: None)
+    line(c, [(300, 260), (760, 330)], "#1c2418", 22)
+    k = w("gorra")
+    if t > k - 0.3:
+        def gorra():
+            c.new_path(); c.arc(0, 0, 70, math.pi, 2 * math.pi); c.close_path(); fill(c, PATRU["cap_col"])
+            ell(c, 60, 0, 70, 16, "#1e3020"); rect(c, -20, -50, 40, 20, "#c9a24a")
+        scaled(c, 600, 360, popin(t, k - 0.3), gorra)
+        line(c, [(600, 300), (600, 330)], "#1c2418", 8)
+    tag2(c, 820, 700, "3 METROS", t, w("metros"), "#ffffff")
+FOCUS["i16"] = (600, 400)
+CAM["i16"] = [("gorra", 1.6, 600, 400)]
+
+def i17(c, t, T, w):
+    noche(c, t, dawn=1.0, cross=True)
+    rect(c, 520, 560, 24, 460, "#5a5a5a")
+    rrect(c, 230, 330, 620, 280, 16, "#e8e0c8"); rrect(c, 246, 346, 588, 248, 10, "#f4f0e4")
+    txt(c, "VÍA CERRADA", 540, 420, "#b0202a", 54, True, True)
+    a = clamp((t - w("letra")) / 1.4)
+    if a > 0:
+        c.save(); c.rectangle(246, 440, 588 * a, 150); c.clip()
+        hw(c, "Si usted paró,", 270, 500, 46, "#1a3a8a"); hw(c, "no se baje del carro.", 270, 560, 46, "#1a3a8a"); c.restore()
+FOCUS["i17"] = (540, 460)
+
+def i18(c, t, T, w):
+    noche(c, 0.0, dawn=1.0, cross=True); overlay(c, "#000", 0.6)
 
 PANELS = {k: v for k, v in globals().items() if len(k) == 3 and k[0] in "ghi" and k[1:].isdigit() and callable(v)}
