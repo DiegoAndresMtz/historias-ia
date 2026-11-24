@@ -186,3 +186,97 @@ def tunda(c, x, y, s, t, cara="monstruo", pierna=1.0, mom_skin="#5a3a24"):
         c.new_path(); c.arc(0, -120, 120, math.pi, 2 * math.pi); c.close_path(); fill(c, "#c8301a")
         poly(c, [(90, -150), (170, -190), (150, -120)], "#c8301a")
     c.restore(); c.restore()
+
+# ---------- La Llorona de cuerpo entero ----------
+def _llorona_hair(c, hy, t, length, parted=0.0, seed=4, cap=True):
+    """Pelo negro, largo y mojado. parted=0 tapa la cara; 1 = abierto a los lados (deja ver la cara)."""
+    r = random.Random(seed)
+    for k in range(34):
+        f = k / 33.0; x0 = -88 + 176 * f
+        if parted: x0 = (-1 if f < 0.5 else 1) * (92 + 70 * abs(f - 0.5) * 2) * parted + x0 * (1 - parted)
+        y0 = hy - 20 - math.sqrt(max(0, 98 ** 2 - min(abs(x0), 97) ** 2)) * 0.85
+        pts = [(x0, y0)]
+        for j in range(1, 8):
+            yy = y0 + (length + hy - y0) * j / 7
+            widen = 1 + 0.35 * j / 7
+            pts.append((x0 * widen + r.uniform(-7, 7) + math.sin(t * 1.3 + k * 0.7 + j) * 2.5 * j, yy))
+        line(c, pts, r.choice(["#050507", "#0b0b10", "#101016"]), r.uniform(9, 15))
+    if cap:
+        c.new_path(); c.arc(0, hy - 20 - 40 * parted, 98, math.pi, 2 * math.pi); c.close_path(); fill(c, "#07070a")
+
+def llorona_cuerpo(c, x, y, s, t, cara="pelo", brazos="caidos", rodillas=False, bulto=False, glow_a=1.0, alto=1.0):
+    """Mujer de blanco, altísima, pelo negro hasta la cintura. y = pies (o rodillas si rodillas=True).
+    cara: 'pelo' (tapada, un ojo brilla entre el pelo) | 'calavera' (se abre el pelo) | 'sombra' (lejos, sin detalle)
+    brazos: 'caidos' | 'abiertos' | 'lavando' | 'pelo' | 'bulto'"""
+    dx, dy, rot = _twitch(t, 0, 0.7)
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    H = (0.62 if rodillas else 1.0) * alto
+    top = -800 * H; sh = top + 40           # hombros
+    hy = top - 110                           # centro de la cabeza
+    glow(c, 0, (top + 0) / 2, 700 * max(H, 0.7), "#bcd4ff", 0.16 * glow_a)
+    sway = math.sin(t * 1.6) * 10
+    skin = "#b9c2cc"; skin_d = "#7d8794"
+    # vestido blanco, largo y rasgado
+    r = random.Random(8)
+    hem_w = 260 if rodillas else 190
+    hem = []
+    for k in range(15):
+        f = k / 14.0
+        hem.append((-hem_w + 2 * hem_w * f + sway * (0.5 + f), (r.uniform(-10, 34) if k % 2 else r.uniform(-50, -10))))
+    body = [(-70, sh), (-110, sh + 140 * H)] + hem + [(110, sh + 140 * H), (70, sh)]
+    c.new_path(); c.move_to(*body[0])
+    for p in body[1:]: c.line_to(*p)
+    c.close_path()
+    g = cairo.LinearGradient(0, top, 0, 0); g.add_color_stop_rgba(0, *hx("#f2f4f8")); g.add_color_stop_rgba(0.7, *hx("#d6dce6")); g.add_color_stop_rgba(1, *hx("#9aa6b8", 0.55))
+    c.set_source(g); c.fill_preserve(); c.set_line_width(5); src(c, hx("#5a6472", 0.8)); c.stroke()
+    for k in range(6):   # manchas de agua y barro
+        xx = -120 + k * 48 + sway * 0.4
+        line(c, [(xx * 0.5, sh + 60), (xx, -60 + (k % 3) * 20)], hx("#5a6472", 0.35), 6)
+    if rodillas:   # la falda empozada en el suelo
+        ell(c, 0, 0, 300, 40, hx("#cfd6e0", 0.9)); ell(c, 0, 4, 300, 30, hx("#8a96a8", 0.4))
+    # brazos largos y flacos con dedos largos
+    def hand(hx_, hy_, ang):
+        circ(c, hx_, hy_, 22, skin)
+        for k in range(5):
+            a = ang + (k - 2) * 0.22; L_ = 70 + (k % 3) * 14
+            line(c, [(hx_, hy_), (hx_ + math.cos(a) * L_ * 0.55, hy_ + math.sin(a) * L_ * 0.55), (hx_ + math.cos(a + 0.25) * L_, hy_ + math.sin(a + 0.25) * L_)], skin, 9)
+            circ(c, hx_ + math.cos(a + 0.25) * L_, hy_ + math.sin(a + 0.25) * L_, 4, "#2a2a30")
+    for sx in (-1, 1):
+        sxp = sx * 82
+        if brazos == "abiertos":
+            pts = [(sxp, sh + 10), (sx * 260, sh - 60), (sx * 470, sh - 150 + math.sin(t * 2 + sx) * 12)]; ang = -0.4 if sx > 0 else math.pi + 0.4
+        elif brazos == "lavando":
+            pts = [(sxp, sh + 10), (sx * 150, sh + 220 * H), (sx * 60 + math.sin(t * 4 + sx) * 30, sh + 470 * H)]; ang = math.pi / 2
+        elif brazos == "pelo":
+            pts = [(sxp, sh + 10), (sx * 200, sh - 40), (sx * 120, hy - 30)]; ang = -math.pi / 2 if sx > 0 else -math.pi / 2
+        elif brazos == "bulto":
+            pts = [(sxp, sh + 10), (sx * 150, sh + 170), (sx * 50, sh + 240)]; ang = math.pi if sx > 0 else 0
+        else:
+            pts = [(sxp, sh + 10), (sx * 135, sh + 280 * H), (sx * 150, sh + 560 * H)]; ang = math.pi / 2
+        line(c, pts, skin_d, 34); line(c, pts, skin, 26)
+        hand(pts[-1][0], pts[-1][1], ang)
+    # cuello y cabeza
+    rect(c, -26, top - 30, 52, 70, skin)
+    c.save(); c.translate(0, hy); c.rotate(rot - 0.12)
+    if cara == "calavera":
+        _llorona_hair(c, 0, t, 420 * H + 200, parted=1.0, cap=False)
+        c.save(); c.scale(0.8, 0.8); _skull_head(c, 110, 150, "#d8dce0", "#6a7080")
+        _eyes(c, 110, 150, t, "#dfe8ff", (0, 0.2), 0.95)
+        for sx in (-1, 1): line(c, [(sx * 42, -14), (sx * 46, 60), (sx * 40, 120)], hx("#000", 0.85), 9)
+        c.save(); c.translate(0, -10); _grin(c, 110, 150, t, 0.85, teeth=12, lip="#000", stretch=0.6); c.restore()
+        c.restore()
+        c.new_path(); c.arc(0, -70, 100, math.pi, 2 * math.pi); c.close_path(); fill(c, "#07070a")
+    elif cara == "sombra":
+        _llorona_hair(c, 0, t, 420 * H + 200, parted=0.0)
+    else:
+        c.save(); c.scale(0.8, 0.8); _skull_head(c, 110, 150, "#c8ccd4", "#4a5060"); c.restore()
+        _llorona_hair(c, 0, t, 420 * H + 200, parted=0.0)
+        # un ojo que brilla entre el pelo
+        glow(c, 34, -10, 60, "#dfe8ff", 0.5 + 0.25 * math.sin(t * 4)); circ(c, 34, -10, 7, "#eaf0ff"); circ(c, 34, -10, 3, "#000")
+    c.restore()
+    if bulto:
+        ell(c, 0, sh + 230, 120, 80, "#6a6050")
+        for k in range(5): line(c, [(-100 + k * 40, sh + 180), (-80 + k * 40, sh + 290)], hx("#3a3428", 0.7), 6)
+        ell(c, -30, sh + 200, 46, 40, "#4a3e30"); circ(c, -38, sh + 196, 6, "#000"); circ(c, -18, sh + 196, 6, "#000")
+        for sx in (-1, 1): line(c, [(sx * 150, sh + 170), (sx * 50, sh + 240)], skin, 26)
+    c.restore()
