@@ -50,17 +50,45 @@ def patasola(c, s, t):
     for sx in (-1, 1): poly(c, [(sx * 34, 70), (sx * 22, 70), (sx * 28, 118)], "#f0e8d0")              # colmillos
     _drip(c, -30, 110, t, "#7a0000", 3)
 
-def mohan(c, s, t):
+def _tabaco(c, x, y, ang, t, L_=110):
+    """Tabaco grueso con la punta encendida y humo."""
+    c.save(); c.translate(x, y); c.rotate(ang)
+    line(c, [(0, 0), (L_, 0)], "#3a220e", 26); line(c, [(0, -6), (L_, -6)], "#5a3a1a", 8)
+    glow(c, L_ + 6, 0, 70, "#ff6a1a", 0.55 + 0.25 * math.sin(t * 5)); circ(c, L_ + 6, 0, 14, "#ff8a2a"); circ(c, L_ + 8, 0, 7, "#fff0c0")
+    c.restore()
+    for k in range(5):   # humo que sube
+        a = (t * 0.35 + k / 5) % 1
+        ex = x + math.cos(ang) * (L_ + 6); ey = y + math.sin(ang) * (L_ + 6)
+        ell(c, ex + math.sin(t * 1.3 + k) * 30 * a, ey - 40 - 260 * a, 26 + 50 * a, 16 + 30 * a, hx("#c8c8b8", 0.28 * (1 - a)))
+
+def _musgo(c, w, top, bottom, n, seed, t, sway=2.0, cols=("#2a3a1a", "#3a4a22", "#1a2410", "#4a5a2a")):
+    r = random.Random(seed)
+    for k in range(n):
+        x0 = -w + 2 * w * k / max(1, n - 1) + r.uniform(-8, 8)
+        pts = [(x0, top + r.uniform(-10, 10))]
+        Lb = bottom + r.uniform(-60, 40)
+        for j in range(1, 6):
+            yy = top + (Lb - top) * j / 5
+            pts.append((x0 + r.uniform(-12, 12) + math.sin(t * 1.4 + k * 0.6 + j) * sway * j, yy))
+        line(c, pts, r.choice(cols), r.uniform(9, 16))
+
+def mohan(c, s, t, tabaco=True):
     r = random.Random(11)
-    for k in range(40):
-        a = r.uniform(math.pi * 0.9, math.pi * 2.1); rr = r.uniform(140, 220)
-        line(c, [(0, -30), (math.cos(a) * rr, -30 + math.sin(a) * rr)], r.choice(["#2a3a1a", "#3a4a22", "#1a2410"]), 14)
-    _skull_head(c, 120, 160, "#7a5a3a", "#2a1a0a")
-    _eyes(c, 120, 160, t, "#6aff3a", (0, 0), 0.9)
-    for k in range(26):                                                                                 # barba de musgo
-        x = -110 + k * 9; line(c, [(x, 60), (x + r.uniform(-20, 20), 60 + r.uniform(140, 240))], r.choice(["#3a4a22", "#2a3a1a"]), 12)
-    c.save(); c.translate(0, -16); _grin(c, 110, 170, t, 0.25, teeth=10, lip="#1a0a00", stretch=0.6); c.restore()
-    for k in range(3): circ(c, -24 + k * 24, 56, 7, "#e8c23a")                                          # dientes de oro
+    for k in range(70):                                                                                 # melena de musgo y bejuco
+        a = r.uniform(math.pi * 0.75, math.pi * 2.25); rr = r.uniform(150, 250)
+        pts = [(0, -20)]
+        for j in range(1, 5): pts.append((math.cos(a) * rr * j / 4 + r.uniform(-12, 12), -20 + math.sin(a) * rr * j / 4 + math.sin(t + k) * 3 * j))
+        line(c, pts, r.choice(["#2a3a1a", "#3a4a22", "#1a2410", "#4a3a1a"]), r.uniform(10, 18))
+    _skull_head(c, 125, 165, "#6a4a2a", "#1a0e04")
+    _cracks(c, 120, 160, 13, "#0a0602", 8)
+    for sx in (-1, 1): poly(c, [(sx * 20, -66), (sx * 96, -44), (sx * 92, -30), (sx * 18, -50)], "#0a0602")   # cejas gruesas
+    _eyes(c, 120, 160, t, "#ff3a0a", (0, 0.1), 1.0)
+    _musgo(c, 120, 50, 280, 30, 5, t, 2.5)                                                              # barba de musgo hasta el pecho
+    c.save(); c.translate(0, -14); _grin(c, 115, 175, t, 0.45, teeth=14, lip="#1a0a00", stretch=0.85); c.restore()
+    for k in range(4): poly(c, [(-36 + k * 24, 40), (-24 + k * 24, 40), (-30 + k * 24, 66)], "#e8c23a")   # dientes de oro
+    for k in range(3): circ(c, -24 + k * 24, 46, 6, "#fff4b0")
+    _drip(c, 60, 120, t, "#1a2a3a", 4); _drip(c, -70, 110, t, "#1a2a3a", 5)                            # le escurre agua del río
+    if tabaco: _tabaco(c, 50, 50, -0.35, t)
 
 def madremonte(c, s, t):
     r = random.Random(3)
@@ -279,4 +307,74 @@ def llorona_cuerpo(c, x, y, s, t, cara="pelo", brazos="caidos", rodillas=False, 
         for k in range(5): line(c, [(-100 + k * 40, sh + 180), (-80 + k * 40, sh + 290)], hx("#3a3428", 0.7), 6)
         ell(c, -30, sh + 200, 46, 40, "#4a3e30"); circ(c, -38, sh + 196, 6, "#000"); circ(c, -18, sh + 196, 6, "#000")
         for sx in (-1, 1): line(c, [(sx * 150, sh + 170), (sx * 50, sh + 240)], skin, 26)
+    c.restore()
+
+# ---------- El Mohán de cuerpo entero ----------
+def mohan_cuerpo(c, x, y, s, t, cara="monstruo", brazos="caidos", tabaco=True, glow_a=1.0):
+    """Gigante peludo del río: cuerpo cubierto de musgo y bejuco, brazos larguísimos con uñas negras,
+    ojos de brasa, dientes de oro y tabaco encendido. y = pies (alto ~ 1000*s).
+    cara: 'monstruo' | 'sombra' (lejos: silueta con ojos y brasa)
+    brazos: 'caidos' | 'abiertos' | 'tiple' (toca el tiple) | 'agarra' (manos hacia adelante, abajo)"""
+    dx, dy, rot = _twitch(t, 3, 0.8)
+    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    glow(c, 0, -500, 720, "#ff5a1a", 0.10 * glow_a)
+    body = "#1e140a"; hair = ("#2a3a1a", "#3a4a22", "#1a2410", "#4a3a1a")
+    # piernas peludas y pies enormes
+    for sx in (-1, 1):
+        rrect(c, sx * 110 - 50, -300, 100, 300, 40, body)
+        ell(c, sx * 120 + sx * 20, -10, 90, 34, "#140c06")
+        for k in range(4): poly(c, [(sx * 120 + sx * 70 + k * sx * 0 - 30 + k * 18, -14), (sx * 120 + sx * 70 - 22 + k * 18, -14), (sx * 120 + sx * 70 - 26 + k * 18, 8)], "#000")
+    # torso jorobado
+    c.new_path(); c.move_to(-230, -300); c.curve_to(-300, -600, -200, -820, 0, -830); c.curve_to(200, -820, 300, -600, 230, -300); c.close_path(); fill(c, body)
+    _musgo(c, 250, -800, -240, 40, 21, t, 2.0, hair)
+    # brazos
+    def arm(pts):
+        line(c, pts, "#0e0a04", 74); line(c, pts, body, 62)
+        r = random.Random(int(pts[-1][0]))
+        for k in range(len(pts) - 1):
+            (ax, ay), (bx, by) = pts[k], pts[k + 1]
+            for j in range(5):
+                f = (j + 0.5) / 5; px, py = ax + (bx - ax) * f, ay + (by - ay) * f
+                line(c, [(px, py), (px + r.uniform(-14, 14), py + 50 + r.uniform(0, 40))], r.choice(hair), 10)
+    def hand(hx_, hy_, ang):
+        ell(c, hx_, hy_, 62, 54, "#2a1a0c")
+        for k in range(5):
+            a = ang + (k - 2) * 0.3; L_ = 110 + (k % 3) * 24
+            mx, my = hx_ + math.cos(a) * L_ * 0.6, hy_ + math.sin(a) * L_ * 0.6
+            ex, ey = hx_ + math.cos(a + 0.2) * L_, hy_ + math.sin(a + 0.2) * L_
+            line(c, [(hx_, hy_), (mx, my), (ex, ey)], "#2a1a0c", 22)
+            poly(c, [(ex - 9, ey - 9), (ex + 9, ey + 9), (ex + math.cos(a + 0.5) * 50, ey + math.sin(a + 0.5) * 50)], "#050302")   # uñas negras
+    sh = -720
+    if brazos == "tiple":   # tiple de madera viejo
+        c.save(); c.translate(20, sh + 300); c.rotate(-0.5)
+        ell(c, 0, 0, 120, 90, "#8a5a2a"); ell(c, 0, 0, 108, 78, "#a06a32"); circ(c, 10, 0, 28, "#2a1a0a")
+        rect(c, 100, -16, 300, 32, "#5a3a1a"); rect(c, 390, -26, 70, 52, "#3a2210")
+        for k in range(4): line(c, [(-60, -12 + k * 8), (460, -12 + k * 8)], hx("#e8e0c8", 0.8), 2)
+        c.restore()
+    sh = -720
+    for sx in (-1, 1):
+        if brazos == "abiertos":
+            pts = [(sx * 190, sh), (sx * 380, sh - 60), (sx * 560, sh - 200 + math.sin(t * 2 + sx) * 14)]; ang = -0.5 if sx > 0 else math.pi + 0.5
+        elif brazos == "tiple":
+            pts = [(190, sh), (330, sh + 80), (300, sh + 145)] if sx > 0 else [(-190, sh), (-230, sh + 200), (-10, sh + 300 + math.sin(t * 9) * 12)]
+            ang = -math.pi / 2 - 0.4 if sx > 0 else -0.3
+        elif brazos == "agarra":
+            pts = [(sx * 190, sh), (sx * 300, sh + 260), (sx * 220, sh + 520 + math.sin(t * 3 + sx) * 20)]; ang = math.pi / 2
+        else:
+            pts = [(sx * 190, sh), (sx * 270, sh + 330), (sx * 250, sh + 660)]; ang = math.pi / 2
+        arm(pts); hand(pts[-1][0], pts[-1][1], ang)
+    # cabeza
+    c.save(); c.translate(0, -930); c.rotate(rot); c.scale(0.95, 0.95)
+    if cara == "sombra":
+        r = random.Random(11)
+        for k in range(60):
+            a = r.uniform(math.pi * 0.75, math.pi * 2.25); rr = r.uniform(150, 240)
+            line(c, [(0, -20), (math.cos(a) * rr, -20 + math.sin(a) * rr)], "#0e1408", 16)
+        c.save(); c.scale(1, 1.3); circ(c, 0, 0, 125, "#0a0804"); c.restore()
+        _musgo(c, 110, 60, 260, 22, 5, t, 2.0, ("#0e1408", "#141c0c"))
+        for sx in (-1, 1): glow(c, sx * 44, -10, 70, "#ff3a0a", 0.7); circ(c, sx * 44, -10, 10, "#ff7a3a"); circ(c, sx * 44, -10, 4, "#fff")
+        if tabaco: _tabaco(c, 50, 50, -0.35, t)
+    else:
+        mohan(c, 1, t, tabaco)
+    c.restore()
     c.restore()
