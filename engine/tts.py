@@ -23,7 +23,12 @@ VOICES = {
     "K": (V("ef_dora"), 1.0, 1.28),
     "V": (V("ef_dora"), 0.85, 0.9),                                   # abuela                                   # niño/niña
     "X": (0.6 * V("em_santa") + 0.4 * V("am_onyx"), 0.82, 0.86),     # voz ronca (payaso)
+    "L": (V("ef_dora"), 0.8, 0.9),                                    # lamento de espanto (La Llorona)
 }
+# efectos extra por voz: L = sollozo tembloroso + eco de río + una segunda voz fantasma una octava abajo
+EXTRA = {"L": ("asplit[a][b];[b]rubberband=pitch=0.5:formant=shifted,lowpass=f=1800,volume=0.55[g];[a][g]amix=inputs=2:normalize=0,"
+               "vibrato=f=5.5:d=0.3,tremolo=f=6:d=0.45,highpass=f=90,"
+               "aecho=0.8:0.75:110|230|420|700:0.5|0.38|0.26|0.16")}
 def chain(pitch):
     return (f"rubberband=pitch={pitch}:formant=preserved,highpass=f=55,equalizer=f=120:t=q:w=1.2:g=3,"
             "equalizer=f=2800:t=q:w=1:g=1.5,equalizer=f=7000:t=q:w=1:g=-2,"
@@ -35,7 +40,7 @@ for sc, v, text, pause in LINES:
     if len(text) < 32 and not text.startswith("¿"): sp *= 0.9      # frases cortas = más dramáticas
     a, sr0 = k.create(text, voice=st, speed=sp, lang="es-419")
     sf.write("/tmp/_l.wav", a, sr0)
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "/tmp/_l.wav", "-af", chain(pitch), "-ar", str(SR), "-ac", "1", "/tmp/_l2.wav"], check=True)
+    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", "/tmp/_l.wav", "-af", chain(pitch) + ("," + EXTRA[v] if v in EXTRA else ""), "-ar", str(SR), "-ac", "1", "/tmp/_l2.wav"], check=True)
     a, _ = sf.read("/tmp/_l2.wav")
     idx = np.where(np.abs(a) > 0.01)[0]; a = a[max(0, idx[0] - 400):idx[-1] + 5000]
     dd = len(a) / SR; spk = dd - 0.12

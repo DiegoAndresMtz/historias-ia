@@ -344,10 +344,14 @@ FOCUS["u04"] = (480, 700)
 
 def u05(c, t, T, w):
     vgrad(c, 0, 0, P, P, "#140c08", "#050302")
-    rect(c, 140, 820, 26, 80, "#f0ead8"); ell(c, 153, 810, 11, 20, "#ffc24a"); glow(c, 153, 810, 160, "#ffb060", 0.4)
-    for k in range(40): circ(c, 600 + (k * 37) % 400, 980 + (k * 13) % 40, 4, "#f4f4f0")   # sal en la puerta
-    for i, (tok, s_) in enumerate((("amarran", "1. ROSA AMARRADA"), ("sal", "2. SAL EN LA PUERTA"), ("nadie", "3. NADIE ABRE"))):
-        tag2(c, 560, 380 + i * 170, s_, t, w(tok), "#ffc24a" if i < 2 else "#e0303a", "#11131a" if i < 2 else "#ffffff", 42)
+    k = w("vela"); lit = clamp((t - k) / 0.3)
+    glow(c, 640, 640, 520, "#ffb060", 0.35 * lit)
+    for q in range(40): circ(c, 80 + (q * 37) % 920, 1010 + (q * 13) % 40, 5, "#f4f4f0")   # sal en la puerta
+    bust(c, 420, 1150, 1.0, t, "angry", look=(0.5, 0.2), talk="auto", **PAPA)
+    rect(c, 700, 700, 40, 220, "#f0ead8"); rect(c, 680, 910, 80, 20, "#8a6a3a")
+    if lit > 0:
+        fl = 1 + 0.12 * math.sin(t * 13) + 0.06 * math.sin(t * 29)
+        ell(c, 720, 680 - 10 * fl, 16 * fl * lit, 34 * fl * lit, "#ffc24a"); ell(c, 720, 688, 8 * lit, 16 * lit, "#fff2c0")
 FOCUS["u05"] = (540, 560)
 
 def u06(c, t, T, w):

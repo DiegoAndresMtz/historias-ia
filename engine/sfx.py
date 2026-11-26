@@ -73,7 +73,15 @@ def lock():
     s = np.zeros(int(0.3 * SR)); s[:len(a)] += a; s[int(0.12 * SR):int(0.12 * SR) + len(a)] += a * 1.4; return s
 def whisper():
     t = T(1.6); return bp(rng.normal(0, 1, len(t)), 2000, 7000) * (0.5 + 0.5 * np.sin(2 * np.pi * 5 * t) ** 2) * np.sin(np.pi * t / 1.6) * 0.4
-FX = {"creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
+def lamento(d=3.2):
+    """Gemido de mujer a lo lejos: voz que se quiebra, baja de tono y tiembla, con aire."""
+    t = T(d); f = 640 * np.exp(-0.32 * t) + 25 * np.sin(2 * np.pi * 5.2 * t) * (t / d)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = np.sin(ph) + 0.5 * np.sin(2 * ph + 0.3) + 0.25 * np.sin(3 * ph) + 0.12 * np.sin(5 * ph)
+    v = bp(v, 300, 3200) + bp(rng.normal(0, 1, len(t)), 900, 4000) * 0.25
+    e = np.minimum(1, t / 0.35) * np.clip((d - t) / 1.2, 0, 1) * (0.75 + 0.25 * np.sin(2 * np.pi * 1.3 * t))
+    return v * e * 0.5
+FX = {"lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
       "heart": lambda: np.concatenate([heart(), heart()]), "doorbell": doorbell, "scrape": scrape, "paper": paper, "steps": steps,
       "riser_end": lambda: riser(1.2, 200, 900) * 0.6}
 

@@ -195,7 +195,9 @@ def paper_note(c, x, y, s, lines_, t, t0=0.0, rot=-0.04, red=False, sig=None):
             hw(c, l, -270, -120 + i * 80, 56, "#b0202a" if red else "#1c2a5a"); c.restore()
     scaled(c, x, y, s, f)
 
+TAGS = False   # orden de Diego: sin letreros extra en la imagen (solo subtítulos)
 def tag2(c, x, y, s_, t, t0, col="#ffc24a", tcol="#11131a", size=40):
+    if not TAGS: return
     sc = popin(t, t0)
     if sc <= 0.01: return
     c.save(); c.translate(x, y); c.scale(sc, sc); tag(c, 0, 0, s_, col, tcol, size); c.restore()

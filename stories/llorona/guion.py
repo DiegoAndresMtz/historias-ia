@@ -12,7 +12,7 @@ PARTS = {
  ("t03", "N", "Tu mamá se ahogó en ese río hace un año. Y Luz todavía la espera, todas las noches, en la ventana.", 0.6),
  ("t04", "N", "Tu abuela tiene una sola regla, y te la repite cada noche: si oyes a una mujer llorando en el río, no la mires. Y nunca, nunca le contestes.", 0.6),
  ("t05", "N", "Esta noche, a las doce en punto, te despierta un llanto.", 0.6),
- ("t06", "M", "¡Ay, mis hijos! ¿Dónde están mis hijos?", 0.8),
+ ("t06", "L", "¡Aaay, mis hijos! ¿Dónde están mis hijos?", 0.8),
  ("t07", "N", "Luz ya está en la ventana. Con los ojos abiertos. Sin parpadear.", 0.4),
  ("t08", "K", "Es mi mamá. Está llorando porque no nos encuentra.", 0.5),
  ("t09", "N", "Te asomas. Abajo, en las piedras del río, hay una mujer vestida de blanco, arrodillada, lavando ropa. El pelo negro le tapa toda la cara.", 0.4),
@@ -40,7 +40,7 @@ PARTS = {
  ("v01", "N", "Jalas a Luz con todas tus fuerzas. La mano la suelta. Y subes con ella al techo por el zarzo.", 0.4),
  ("v02", "N", "Desde el techo ves la calle inundada. Y en medio del agua, de pie, la mujer de blanco. Con los brazos abiertos.", 0.5),
  ("v03", "N", "Tu abuela se quedó abajo. Ya no la escuchas.", 0.6),
- ("v04", "M", "¿Dónde están mis hijos?", 0.6),
+ ("v04", "L", "¡Aaay! ¿Dónde están mis hijos?", 0.6),
  ("v05", "N", "Luz se suelta de tu mano. Camina hacia el borde del techo. Hacia ella.", 0.5),
  ("v06", "N", "Y haces lo único que puedes hacer. Gritas: ¡aquí estoy yo! ¡Lléveme a mí!", 0.6),
  ("v07", "N", "Luz se detiene. La Llorona voltea a mirarte. Y despacio, se abre el pelo con las manos.", 0.6),
@@ -82,7 +82,7 @@ FX = {
 }
 CUES = {
  "t01": [("llorona", "boom", 1.3)], "t03": [("ahogó", "boom_s", 0.7)], "t04": [("nunca", "boom_s", 0.6)],
- "t05": [("doce", "ping", 0.4), ("llanto", "whisper", 0.8)], "t06": [("hijos", "boom_s", 0.6)], "t07": [("parpadear", "heart", 0.8)],
+ "t05": [("doce", "ping", 0.4), ("llanto", "lamento", 0.9)], "t06": [("aaay", "lamento", 0.55), ("hijos", "boom_s", 0.6)], "t07": [("parpadear", "heart", 0.8)],
  "t09": [("blanco", "creak", 0.6)], "t10": [("igualito", "boom", 1.1)], "t11": [("aquí", "boom_s", 0.9)],
  "t12": [("silencio", "riser_end", 0.6), ("metros", "boom", 1.2)],
  "u01": [("muerde", "boom_s", 0.7)], "u02": [("cae", "ping", 0.5)], "u03": [("viene", "boom_s", 0.8)],
@@ -90,7 +90,7 @@ CUES = {
  "u07": [("ábreme", "whisper", 0.6)], "u08": [("enterrar", "boom_s", 0.7)], "u09": [("agua", "scrape", 0.6)],
  "u10": [("rodillas", "heart", 0.8)], "u11": [("mano", "boom", 1.1)], "u12": [("grita", "boom", 1.2)],
  "v01": [("jalas", "boom_s", 0.7)], "v02": [("brazos", "riser_end", 0.6)], "v03": [("escuchas", "heart", 0.7)],
- "v04": [("hijos", "whisper", 0.7)], "v05": [("borde", "steps", 0.7)], "v06": [("yo", "boom_s", 0.9)],
+ "v04": [("aaay", "lamento", 0.6), ("hijos", "whisper", 0.7)], "v05": [("borde", "steps", 0.7)], "v06": [("yo", "boom_s", 0.9)],
  "v07": [("despacio", "creak", 0.8)], "v08": [("calavera", "boom", 1.3)], "v09": [("hunde", "boom", 1.2)],
  "v10": [("amanecer", "ping", 0.3)], "v11": [("zapatos", "boom_s", 0.8)], "v12": [("sola", "whisper", 0.7)],
 }
