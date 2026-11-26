@@ -84,3 +84,5 @@ Horario (hora Colombia, `mode: customScheduled`, `schedulingType: automatic`):
 - Cámara clásica quieta (sin acercamiento lento): solo cortes y golpes en palabras clave.
 - Personalidad automática: al hablar inclina la cabeza, asiente y sube las cejas; mira alrededor y parpadea a su ritmo; tiembla de miedo con mood "shock", "worry" o "scared".
 - Dale a cada personaje un rasgo propio en su dict: glasses="#color" (abuelas, tías), freckles=True (niños), mustache=True, mole=True, pants="#color".
+- SIN LETREROS EXTRA (orden de Diego): en la imagen solo van los subtítulos, el título de arriba y la tarjeta A/B final. tag2 está apagado (scenes.TAGS = False); no dibujes carteles de texto, cuéntalo con dibujos.
+- Espíritus que lloran o gimen (La Llorona, etc.): usa la voz "L" (sollozo tembloroso + eco + voz fantasma) y el sonido "lamento" en CUES.
