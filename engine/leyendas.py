@@ -121,18 +121,147 @@ def sombreron(c, s, t):
     ell(c, 0, -80, 250, 50, "#000000"); ell(c, 0, -86, 250, 44, "#14141a")
     poly(c, [(-100, -86), (100, -86), (80, -230), (-80, -230)], "#14141a"); rect(c, -100, -110, 200, 20, "#2a2a34")
 
-def pollo_maligno(c, s, t):
+def _pluma(c, x, y, ang, L_, w_, col, edge="#5a4a3a"):
+    """Pluma desflecada (punta en ang)."""
+    ca, sa = math.cos(ang), math.sin(ang); nx, ny = -sa, ca
+    pts = [(x + nx * w_, y + ny * w_), (x + ca * L_ * 0.8 + nx * w_ * 0.8, y + sa * L_ * 0.8 + ny * w_ * 0.8),
+           (x + ca * L_, y + sa * L_), (x + ca * L_ * 0.8 - nx * w_ * 0.8, y + sa * L_ * 0.8 - ny * w_ * 0.8), (x - nx * w_, y - ny * w_)]
+    poly(c, pts, col)
+    line(c, [(x, y), (x + ca * L_ * 0.92, y + sa * L_ * 0.92)], hx(edge, 0.55), 3)
+
+def _cresta(c, t, x=0, y=-120, s=1.0):
+    """Cresta de gallo roja, carnosa y mojada."""
+    c.save(); c.translate(x, y); c.scale(s, s)
+    sw = math.sin(t * 3) * 4
+    pts = [(-90, 10)]
+    for k in range(6):
+        cx_ = -75 + k * 30; h = 95 + (k % 2) * 40 + (25 if k in (2, 3) else 0)
+        pts += [(cx_ - 12, -h * 0.55), (cx_ + sw * (k / 5), -h), (cx_ + 14, -h * 0.55)]
+    pts += [(95, 10)]
+    poly(c, pts, "#7a0608")
+    c.save(); c.translate(-4, 6); c.scale(0.9, 0.86); poly(c, pts, "#c0121a"); c.restore()
+    for k in range(5): ell(c, -60 + k * 30, -50 - (k % 2) * 16, 7, 14, hx("#ff8a8a", 0.45))
+    _drip(c, 30, 0, t, "#8a0008", 5)
+    c.restore()
+
+def pollo_maligno(c, s, t, busto=True, open_=0.75):
+    """Cabeza del Pollo Maligno: orejas de murciélago, cresta de gallo, cuencas negras con pupila amarilla,
+    pico ganchudo y boca de colmillos, barbillas rojas y gorguera de plumas de gallinazo."""
     r = random.Random(9)
-    for k in range(40):
-        a = r.uniform(0, 2 * math.pi); rr = r.uniform(80, 220)
-        poly(c, [(0, 20), (math.cos(a) * rr, 20 + math.sin(a) * rr), (math.cos(a + 0.12) * rr * 0.9, 20 + math.sin(a + 0.12) * rr * 0.9)], r.choice(["#3a1a06", "#2a1004", "#4a2208"]))
-    circ(c, 0, -20, 120, "#2a1206")
-    for k in range(5): poly(c, [(-60 + k * 30, -130), (-45 + k * 30, -200 - (k % 2) * 30), (-30 + k * 30, -130)], "#a01010")  # cresta
+    if busto:
+        for k in range(44):   # gorguera de plumas negras desflecadas
+            a = math.pi * (0.05 + 0.9 * k / 43) + r.uniform(-0.05, 0.05)
+            _pluma(c, r.uniform(-60, 60), 150, a, r.uniform(110, 190), r.uniform(16, 26), r.choice(["#120a06", "#1e120a", "#0a0604"]))
+        poly(c, [(-170, 190), (170, 190), (240, 300), (-240, 300)], "#0e0806")
+    for k in range(30):       # plumas erizadas detrás de la cabeza
+        a = math.pi * (0.95 + 1.1 * k / 29); rr = r.uniform(190, 250)
+        _pluma(c, 0, -10, a, rr, r.uniform(14, 22), r.choice(["#160c06", "#24140a", "#0c0604"]))
+    for sx in (-1, 1):        # orejas de murciélago
+        tw = math.sin(t * 7 + sx) * 0.04
+        c.save(); c.translate(sx * 85, -95); c.rotate(sx * (0.45 + tw))
+        poly(c, [(-sx * 40, 30), (sx * 10, -190), (sx * 55, 30)], "#1a0e0c")
+        poly(c, [(-sx * 22, 20), (sx * 10, -150), (sx * 38, 20)], "#5a1a1e")
+        for k in range(3): line(c, [(sx * 10, -140 + k * 10), (sx * (-10 + k * 18), 20)], hx("#2a0a0a", 0.8), 3)
+        c.restore()
+    _cresta(c, t, 0, -128, 1.05)
+    c.save(); c.scale(1.0, 1.05); _skull_head(c, 125, 150, "#4a3634", "#0c0606"); c.restore()
+    for k in range(5): line(c, [(-70 + k * 4, -110 + k * 16), (70 - k * 4, -110 + k * 16)], hx("#000", 0.25), 3)   # arrugas
+    _cracks(c, 115, 150, 12, "#0a0202", 7)
+    _eyes(c, 125, 150, t, "#ffd21a", (0, 0.3), 1.15)
+    for sx in (-1, 1): line(c, [(sx * 92, -70), (sx * 18, -38)], "#000", 12)    # ceño
+    # nariz de murciélago (hoja nasal)
+    poly(c, [(-26, -10), (0, -48), (26, -10), (14, 18), (-14, 18)], "#2a1a18")
+    ell(c, -10, 8, 6, 9, "#000"); ell(c, 10, 8, 6, 9, "#000")
+    # boca con colmillos y pico ganchudo encima
+    c.save(); c.translate(0, 12); _grin(c, 125, 150, t, open_ + 0.12 * math.sin(t * 5), teeth=18, lip="#3a0000", stretch=0.95); c.restore()
+    for sx in (-1, 1): poly(c, [(sx * 40, 62), (sx * 24, 62), (sx * 33, 128)], "#f4ecd0")   # colmillos
+    poly(c, [(-34, 20), (34, 20), (10, 74), (0, 96), (-10, 74)], "#b8901a")              # pico ganchudo
+    poly(c, [(-20, 24), (6, 24), (-2, 62)], hx("#f0d070", 0.6))
+    _drip(c, -36, 120, t, "#7a0000", 3); _drip(c, 44, 112, t, "#7a0000", 8)
+    for sx in (-1, 1):        # barbillas rojas colgando
+        sw = math.sin(t * 2.5 + sx) * 6
+        ell(c, sx * 70 + sw, 150, 26, 44, "#9a0a10"); ell(c, sx * 66 + sw, 140, 10, 18, hx("#ff7a7a", 0.4))
+
+def pollo_cuerpo(c, x, y, s, t, cara="monstruo", alas="plegadas", glow_a=1.0, open_=0.75):
+    """El Pollo Maligno de cuerpo entero: pajarraco gigante, alas de buitre, cuello pelado, patas escamosas con garras.
+    y = pies (alto ~1300*s). alas: 'plegadas' | 'abiertas' | 'envuelve'. cara: 'monstruo' | 'sombra'."""
+    dx, dy, rot = _twitch(t, 7, 0.8)
+    c.save(); c.translate(x, y); c.scale(s, s)
+    glow(c, 0, -700, 760, "#ffb21a", 0.08 * glow_a)
+    r = random.Random(21)
+    # patas escamosas, rodilla hacia atrás, garras plantadas
     for sx in (-1, 1):
-        ell(c, sx * 50, -40, 34, 30, "#f4f0d0"); circ(c, sx * 50, -40, 12, "#000"); glow(c, sx * 50, -40, 50, "#ffcc1a", 0.4)
-        line(c, [(sx * 84, -70), (sx * 20, -60)], "#000", 10)
-    poly(c, [(-40, 0), (40, 0), (0, 120)], "#c8a020"); poly(c, [(-40, 0), (40, 0), (0, 40)], "#8a6a10")
-    for k in range(4): poly(c, [(-28 + k * 18, 6), (-20 + k * 18, 6), (-24 + k * 18, 30)], "#f4f0e0")
+        hip = (sx * 90, -430); knee = (sx * 120 + 40, -230); ank = (sx * 110, -40)
+        line(c, [hip, knee], "#140a06", 70)
+        line(c, [knee, ank], "#7a6a4a", 34)
+        for k in range(7):
+            f = k / 7; px = knee[0] + (ank[0] - knee[0]) * f; py = knee[1] + (ank[1] - knee[1]) * f
+            line(c, [(px - 16, py), (px + 16, py + 4)], hx("#3a2e1a", 0.8), 3)
+        for a in (-2.7, -1.9, -0.4) if sx < 0 else (-0.45, -1.25, -2.75):
+            pass
+        toes = [(-150, 0), (-40, 10), (70, 4)]
+        for k, (tx, ty) in enumerate(toes):
+            ex = ank[0] + tx * 0.9; ey = ty
+            line(c, [ank, (ex, ey)], "#7a6a4a", 22)
+            poly(c, [(ex - 10, ey - 10), (ex + 10, ey + 6), (ex + (24 if tx > 0 else -24) + (8 if tx == -40 else 0), ey + 30)], "#050302")
+        line(c, [ank, (ank[0] + 50, -20)], "#7a6a4a", 18); poly(c, [(ank[0] + 46, -30), (ank[0] + 58, -14), (ank[0] + 96, -8)], "#050302")   # espolón
+    c.translate(dx, 0); c.translate(0, -500); c.rotate(rot * 0.4); c.translate(0, 500)
+    # alas detrás del cuerpo (abiertas)
+    def ala(sx, spread, flap):
+        base = (sx * 150, -820)
+        for k in range(16):
+            f = k / 15
+            ang = (-math.pi / 2 - sx * (0.25 + 1.35 * spread * f)) if sx > 0 else (-math.pi / 2 - sx * (0.25 + 1.35 * spread * f))
+            ang = math.pi / 2 - (math.pi / 2 + 0.2 + 1.5 * spread * (1 - f)) * sx * 1.0 if False else ang
+            a = -math.pi / 2 + sx * (0.35 + (1.9 * spread + 0.4) * f) + flap * sx
+            L_ = 380 + 360 * spread * (1 - abs(f - 0.55)) + r.uniform(-30, 30)
+            ox, oy = base[0] + sx * 140 * spread * f, base[1] + 60 * f
+            _pluma(c, ox, oy, a, L_, 34 + 8 * spread, r.choice(["#0e0806", "#160c08", "#1a100a"]), "#4a3a2a")
+        for k in range(6):
+            a = -math.pi / 2 + sx * (0.6 + 1.6 * spread * k / 5) + flap * sx
+            line(c, [base, (base[0] + math.cos(a) * 300 * (0.6 + spread * 0.6), base[1] + math.sin(a) * 300 * (0.6 + spread * 0.6))], "#0a0604", 26)
+    if alas == "abiertas":
+        flap = math.sin(t * 2.2) * 0.12
+        for sx in (-1, 1): ala(sx, 1.0, flap)
+    # cuerpo de plumas negras, jorobado
+    c.new_path(); c.move_to(-200, -420); c.curve_to(-300, -650, -210, -900, -40, -930)
+    c.curve_to(150, -930, 300, -700, 220, -420); c.curve_to(120, -360, -110, -360, -200, -420); c.close_path(); fill(c, "#120a06")
+    for k in range(70):   # plumaje desflecado
+        px = r.uniform(-230, 230); py = r.uniform(-900, -420)
+        if (px / 260) ** 2 + ((py + 660) / 280) ** 2 > 1: continue
+        _pluma(c, px, py, math.pi / 2 + r.uniform(-0.4, 0.4), r.uniform(50, 90), r.uniform(12, 18), r.choice(["#1a0e08", "#24160c", "#0e0804"]), "#5a4a38")
+    if alas in ("plegadas", "envuelve"):
+        for sx in (-1, 1):   # alas plegadas como capa, puntas hasta las rodillas
+            spread = 0.0 if alas == "plegadas" else 0.25
+            for k in range(12):
+                f = k / 11
+                bx = sx * (170 + 40 * f + 160 * spread); by = -880 + 90 * f
+                a = math.pi / 2 - sx * (0.12 + 0.25 * f) + (-sx * 0.9 * spread)
+                _pluma(c, bx, by, a, 420 + 120 * f, 36, r.choice(["#0e0806", "#140a06", "#1a100a"]), "#4a3a2a")
+    # cuello pelado y arrugado de gallinazo
+    line(c, [(0, -880), (10, -980), (0, -1060)], "#3a2420", 92)
+    line(c, [(0, -880), (10, -980), (0, -1060)], "#6a4440", 74)
+    for k in range(7): line(c, [(-34, -900 - k * 24), (40, -896 - k * 24)], hx("#2a1414", 0.7), 4)
+    for k in range(16):  # collar de plumas en la base del cuello
+        a = math.pi * (0.0 + k / 15); _pluma(c, math.cos(a) * 90, -880 + 20, math.pi / 2 + (a - math.pi / 2) * 0.6, 90, 18, "#0a0604")
+    c.save(); c.translate(0, -1170); c.rotate(rot); c.scale(0.95, 0.95)
+    if cara == "sombra":
+        for k in range(24):
+            a = math.pi * (0.95 + 1.1 * k / 23); _pluma(c, 0, -10, a, r.uniform(180, 240), 18, "#060304")
+        for sx in (-1, 1):
+            c.save(); c.translate(sx * 85, -95); c.rotate(sx * 0.45); poly(c, [(-sx * 40, 30), (sx * 10, -190), (sx * 55, 30)], "#060304"); c.restore()
+        c.save(); c.translate(0, -128); poly(c, [(-90, 10), (-60, -100), (-30, -70), (0, -150), (30, -80), (60, -110), (95, 10)], "#5a0408"); c.restore()
+        c.save(); c.scale(1, 1.05); circ(c, 0, 0, 130, "#060304"); c.restore()
+        for sx in (-1, 1): glow(c, sx * 48, -26, 80, "#ffd21a", 0.7); circ(c, sx * 48, -26, 10, "#ffe27a"); circ(c, sx * 48, -26, 4, "#fff")
+    else:
+        pollo_maligno(c, 1, t, busto=False, open_=open_)
+    c.restore()
+    if alas == "envuelve":   # alas cerrándose hacia adelante (atrapa a alguien)
+        for sx in (-1, 1):
+            for k in range(9):
+                f = k / 8
+                _pluma(c, sx * (260 - 40 * f), -860 + 60 * f, math.pi / 2 + sx * (0.5 - 0.2 * f), 520, 40, r.choice(["#0a0604", "#120a06"]), "#3a2a1a")
+    c.restore()
 
 ICONOS = {"La Llorona": llorona, "El Silbón": silbon, "La Patasola": patasola, "El Mohán": mohan, "La Madremonte": madremonte,
           "La Tunda": tunda_cara, "El Sombrerón": sombreron, "El Pollo Maligno": pollo_maligno}

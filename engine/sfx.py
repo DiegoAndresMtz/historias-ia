@@ -81,7 +81,19 @@ def lamento(d=3.2):
     v = bp(v, 300, 3200) + bp(rng.normal(0, 1, len(t)), 900, 4000) * 0.25
     e = np.minimum(1, t / 0.35) * np.clip((d - t) / 1.2, 0, 1) * (0.75 + 0.25 * np.sin(2 * np.pi * 1.3 * t))
     return v * e * 0.5
-FX = {"lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
+def piar(f0=3100, f1=2000, n=3, gap=0.42, d=0.16, rasp=0.0):
+    """Pío del Pollo Maligno: chirridos cortos que bajan de tono, con un eco desafinado (agudo = niño, grave = grande)."""
+    s = np.zeros(int((gap * n + 0.6) * SR))
+    for k in range(n):
+        t = T(d); f = f0 * (f1 / f0) ** (t / d) * (1 - 0.04 * k)
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        v = np.sin(ph) + 0.35 * np.sin(2 * ph) + 0.5 * np.sin(ph * 0.503)
+        if rasp: v = v + rasp * np.sign(np.sin(ph)) * 0.6 + rasp * bp(rng.normal(0, 1, len(t)), 200, 1800) * 0.8
+        v = v * np.sin(np.pi * t / d) ** 0.6
+        i = int(k * gap * SR); s[i:i + len(v)] += v
+        j = i + int(0.11 * SR); s[j:j + len(v)] += v * 0.35
+    return s * 0.45
+FX = {"piar": piar, "piar_grave": lambda: piar(520, 300, 3, 0.55, 0.32, 0.7), "whoosh": lambda: whoosh(0.9) * 1.6, "lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
       "heart": lambda: np.concatenate([heart(), heart()]), "doorbell": doorbell, "scrape": scrape, "paper": paper, "steps": steps,
       "riser_end": lambda: riser(1.2, 200, 900) * 0.6}
 
