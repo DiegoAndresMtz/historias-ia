@@ -7,8 +7,8 @@ import leyendas as L
 import guion as G
 
 YOU = dict(hat="beanie", skin="#a8704a", shirt="#3c6a9a", cap_col="#e8702a")
-LUZ = dict(hat="bun", skin="#b07a52", shirt="#f08aa8", hair_col="#1a120c")
-ABUELA = dict(hat="bun", skin="#9a6440", shirt="#5a4a7a", hair_col="#d8d8d8", gray=True)
+LUZ = dict(hat="bun", freckles=True, skin="#b07a52", shirt="#f08aa8", hair_col="#1a120c")
+ABUELA = dict(hat="bun", glasses="#8a6a2a", skin="#9a6440", shirt="#5a4a7a", hair_col="#d8d8d8", gray=True)
 MAMA = dict(hat="bun", skin="#a87048", shirt="#2f8f7a", hair_col="#1a120c")
 FOCUS = {}; CAM = {}
 

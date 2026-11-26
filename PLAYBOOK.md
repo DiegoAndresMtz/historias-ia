@@ -77,3 +77,10 @@ Horario (hora Colombia, `mode: customScheduled`, `schedulingType: automatic`):
 - Descripción: gancho de 1 línea + «Parte N de 3. ¿A o B? 👇» + 5 hashtags (#historiasdeterror #terror #miedo + 1 del tema + #historiasvarias; en YouTube #shorts primero).
 - El plan gratis de Buffer permite 10 publicaciones en cola por canal: no programes más de 2 días adelante.
 - Nunca pidas ni uses contraseñas; solo Buffer.
+
+## Animación sin flotar y con personalidad (orden de Diego, 25-nov)
+- Nadie flota: todos los personajes tienen piernas y zapatos (povlib.legs). Si un personaje se mueve, el motor lo hace CAMINAR solo (rebote de pasos y zancadas); no hace falta nada extra, pero muévelos por el piso, nunca por el aire.
+- Monstruos de cuerpo entero con los pies plantados (el tic mueve el torso, no los pies).
+- Cámara clásica quieta (sin acercamiento lento): solo cortes y golpes en palabras clave.
+- Personalidad automática: al hablar inclina la cabeza, asiente y sube las cejas; mira alrededor y parpadea a su ritmo; tiembla de miedo con mood "shock", "worry" o "scared".
+- Dale a cada personaje un rasgo propio en su dict: glasses="#color" (abuelas, tías), freckles=True (niños), mustache=True, mole=True, pants="#color".

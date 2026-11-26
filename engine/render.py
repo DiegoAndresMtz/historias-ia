@@ -66,12 +66,12 @@ def camera(scene, t, li):
         if t >= s[0]: cur = s; nxt = sh[k + 1][0] if k + 1 < len(sh) else None
     st = cur[0]; en = nxt if nxt is not None else (bounds[scene][1] - bounds[scene][0]) / FPS
     p = clamp((t - st) / max(0.5, en - st))
-    z = cur[1] * (1 + (0.03 if CLASSIC else 0.045) * ease(p))
+    z = cur[1] * (1 + (0.0 if CLASSIC else 0.045) * ease(p))   # clásico: plano quieto, sin flotar
     # golpe de zoom en palabras clave
     g = bounds[scene][0] / FPS + t
     for x, a, b in TL[li]["words"]:
         if clean(x) in KEY and a <= g < a + 0.5: z *= 1 + 0.05 * math.exp(-(g - a) * 9)
-    cx, cy = cur[2], cur[3] + (-12 * p if cur[1] > 1.05 else 0)
+    cx, cy = cur[2], cur[3] + (-12 * p if cur[1] > 1.05 and not CLASSIC else 0)
     half = 540 / z; cx = min(max(cx, half), P - half); cy = min(max(cy, half), P - half)
     return z, cx, cy
 

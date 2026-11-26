@@ -139,7 +139,7 @@ ICONOS = {"La Llorona": llorona, "El Silbón": silbon, "La Patasola": patasola, 
 
 def icono(nombre, c, x, y, s, t):
     dx, dy, rot = _twitch(t, LEYENDAS.index(nombre), 0.6)
-    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s); c.rotate(rot)
+    c.save(); c.translate(x + dx * s, y); c.scale(s, s); c.translate(0, -400); c.rotate(rot * 0.5); c.translate(0, 400); c.rotate(rot)
     ICONOS[nombre](c, s, t); c.restore()
 
 # ---------- ruleta ----------
@@ -187,7 +187,7 @@ def ruleta(c, cx, cy, R, t, dur, target, win=0.0):
 def tunda(c, x, y, s, t, cara="monstruo", pierna=1.0, mom_skin="#5a3a24"):
     """Mujer de vestido amarillo y pañuelo rojo; pierna derecha de palo negro (molinillo). y = pies."""
     dx, dy, rot = _twitch(t, 5, 0.8)
-    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    c.save(); c.translate(x + dx * s, y); c.scale(s, s); c.translate(0, -400); c.rotate(rot * 0.5); c.translate(0, 400)
     sway = math.sin(t * 2.2) * 6
     # piernas: una humana, otra de palo
     rrect(c, -70, -320, 46, 320, 20, mom_skin); ell(c, -48, -6, 40, 14, mom_skin)
@@ -237,7 +237,7 @@ def llorona_cuerpo(c, x, y, s, t, cara="pelo", brazos="caidos", rodillas=False, 
     cara: 'pelo' (tapada, un ojo brilla entre el pelo) | 'calavera' (se abre el pelo) | 'sombra' (lejos, sin detalle)
     brazos: 'caidos' | 'abiertos' | 'lavando' | 'pelo' | 'bulto'"""
     dx, dy, rot = _twitch(t, 0, 0.7)
-    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    c.save(); c.translate(x + dx * s, y); c.scale(s, s); c.translate(0, -400); c.rotate(rot * 0.5); c.translate(0, 400)
     H = (0.62 if rodillas else 1.0) * alto
     top = -800 * H; sh = top + 40           # hombros
     hy = top - 110                           # centro de la cabeza
@@ -316,7 +316,7 @@ def mohan_cuerpo(c, x, y, s, t, cara="monstruo", brazos="caidos", tabaco=True, g
     cara: 'monstruo' | 'sombra' (lejos: silueta con ojos y brasa)
     brazos: 'caidos' | 'abiertos' | 'tiple' (toca el tiple) | 'agarra' (manos hacia adelante, abajo)"""
     dx, dy, rot = _twitch(t, 3, 0.8)
-    c.save(); c.translate(x + dx * s, y + dy * s); c.scale(s, s)
+    c.save(); c.translate(x + dx * s, y); c.scale(s, s); c.translate(0, -400); c.rotate(rot * 0.5); c.translate(0, 400)
     glow(c, 0, -500, 720, "#ff5a1a", 0.10 * glow_a)
     body = "#1e140a"; hair = ("#2a3a1a", "#3a4a22", "#1a2410", "#4a3a1a")
     # piernas peludas y pies enormes

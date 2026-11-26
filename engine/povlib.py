@@ -56,17 +56,45 @@ def callout(c, x, y, r, t, t0, fn, px=None, py=None):
 
 # ---------- character (bust) ----------
 TALK = 0.0   # lo fija el render en cada cuadro según la voz
+_POS = {}; _SEEN = {"t": None, "n": {}}
+def walk_amt(key, x, y, s, t):
+    """Detecta si un personaje se está moviendo entre cuadros: entonces camina (rebote de pasos)."""
+    if _SEEN["t"] != t: _SEEN["t"] = t; _SEEN["n"] = {}
+    i = _SEEN["n"].get(key, 0); _SEEN["n"][key] = i + 1; key = (key, i)
+    prev = _POS.get(key); _POS[key] = (t, x, y, s)
+    if not prev: return 0.0
+    dt = t - prev[0]
+    if dt <= 0 or dt > 0.2: return 0.0
+    v = math.hypot(x - prev[1], y - prev[2]) / dt + abs(s - prev[3]) / dt * 900
+    return max(0.0, min(1.0, (v - 25) / 90))
 OUT = "#120c0e"
 APPEAL = False   # estilo «que enamore»: ojos con iris y brillos, cachetes, pestañas, cejas suaves
 OUTLINE = True   # contorno y sombras (estilo nuevo); False = estilo clásico
+
+def legs(c, t, wk, pants="#262b38", shoe="#151318", skin=None):
+    """Piernas y zapatos bajo el torso (local: el torso termina en y=90). Al caminar dan zancadas."""
+    ph = t * 8.5
+    for sx in (-1, 1):
+        sw = math.sin(ph) * sx * wk
+        c.save(); c.translate(sx * 85, 70); c.rotate(sw * 0.35)
+        rrect(c, -52, 0, 104, 330, 40, OUT if OUTLINE else pants); rrect(c, -46, 0, 92, 322, 36, pants)
+        ell(c, sx * 18, 330, 74, 34, shoe)
+        c.restore()
+
 def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", skin="#c48a5c", shirt="#3c8a5a",
          eyebags=0.0, tears=0.0, mustache=False, hair_col="#2a1a14", cap_col="#e8702a", sweat=0.0, talk=0.0, shake=0.0, apron=False, gray=False,
-         mole=False, hood=False, eye_col="#6a3a1a", lashes=None):
+         mole=False, hood=False, eye_col="#6a3a1a", lashes=None, glasses=False, freckles=False, pants="#262b38"):
     if talk == "auto": talk = TALK
     c.save(); c.translate(x, y); c.scale(s, s)
     if shake: c.translate(math.sin(t * 60) * 4 * shake, math.cos(t * 47) * 2 * shake)
+    # --- vida: caminar con pasos (no deslizarse), respirar sin flotar ---
+    wk = walk_amt((hat, shirt, skin), x, y, s, t)
+    if wk > 0:
+        ph = t * 8.5
+        c.translate(0, -abs(math.sin(ph)) * 26 * wk); c.rotate(math.sin(ph) * 0.045 * wk)
+    legs(c, t, wk, pants=pants)
     br = math.sin(t * 2.0)
-    c.save(); c.translate(0, -br * 3)
+    c.save(); c.translate(0, -br * 1.2); c.scale(1 + 0.008 * br, 1)
     # torso (contorno + sombra)
     if OUTLINE: rrect(c, -209, -249, 418, 348, 108, OUT)
     rrect(c, -200, -240, 400, 330, 100, shirt)
@@ -94,8 +122,17 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     elif arms == "hold":
         line(c, [(-170, -150), (-140, -60), (-60, -40)], shirt, 62); line(c, [(170, -150), (140, -60), (60, -40)], shirt, 62)
     c.restore()
-    # head
-    hy = -380 - br * 4
+    # head: actuación (inclina y asiente al hablar, mira alrededor, tiembla de miedo)
+    hy = -380 - br * 1.2
+    seed = sum(ord(ch) for ch in str(shirt) + str(hat))
+    k_ = int(t / 1.9 + seed * 0.13)
+    rr = random.Random(k_ * 31 + seed)
+    if mood != "creepy" and look == (0, 0) and talk <= 0.05:
+        look = (rr.uniform(-0.35, 0.35), rr.uniform(-0.2, 0.15))
+    tilt = 0.05 * math.sin(t * 1.3 + seed) + (0.07 * math.sin(t * 2.6 + seed) * min(1.0, talk * 2.5) if talk > 0.05 else 0.0)
+    nod = 10 * talk if talk > 0.05 else 0.0
+    trem = 2.2 if mood in ("shock", "worry", "scared") else 0.0
+    c.save(); c.translate(math.sin(t * 41) * trem, hy + 150 + nod + math.cos(t * 37) * trem * 0.6); c.rotate(tilt); c.translate(0, -(hy + 150))
     if OUTLINE: rect(c, -42, hy + 96, 84, 70, OUT); circ(c, -132, hy + 10, 33, OUT); circ(c, 132, hy + 10, 33, OUT); circ(c, 0, hy, 146, OUT)
     rect(c, -34, hy + 100, 68, 60, skin)
     circ(c, -132, hy + 10, 26, skin); circ(c, 132, hy + 10, 26, skin)
@@ -130,7 +167,9 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     if lashes is None: lashes = hat == "bun"
     # face
     ex = 54; ey = hy + 4
-    blink = (t % 4.3) < 0.12
+    bp = 3.1 + (seed % 17) / 10.0
+    ph_b = (t + seed * 0.21) % bp; cyc = int((t + seed * 0.21) / bp)
+    blink = ph_b < 0.12 or (cyc % 3 == 2 and 0.26 < ph_b < 0.36)
     if mood in ("happy", "proud"):
         for sx in (-ex, ex):
             c.new_path(); c.arc(sx, ey + 10, 30, math.pi * 1.15, math.pi * 1.85); c.set_line_width(10); c.set_line_cap(cairo.LINE_CAP_ROUND); src(c, "#1a1110"); c.stroke()
@@ -168,7 +207,8 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
         for sx in (-ex, ex):
             c.new_path(); c.arc(sx, ey + 30, 30, math.pi * 0.15, math.pi * 0.85); c.set_line_width(8); src(c, hx("#6b3d6b", 0.55 * eyebags)); c.stroke()
     # brows
-    bw = {"shock": (-20, 16), "sad": (-6, 10), "worry": (-4, 12), "angry": (10, -8)}.get(mood, (0, 0))
+    bw = {"shock": (-20, 16), "sad": (-6, 10), "worry": (-4, 12), "scared": (-12, 16), "angry": (10, -8)}.get(mood, (0, 0))
+    if talk > 0.05: bw = (bw[0], bw[1] + 9 * talk)
     for sx in (-1, 1):
         line(c, [(sx * (ex + 32), ey - 62 + bw[0] * 0.3), (sx * (ex - 26), ey - 66 - bw[1])], ("#2a1a14" if not gray else "#8e8a86"), 12 if APPEAL else 9)
     # nose
@@ -195,6 +235,15 @@ def bust(c, x, y, s, t, mood="neutral", look=(0, 0), arms="none", hat="beanie", 
     if sweat > 0:
         dy = (t * 60) % 80
         ell(c, 120, hy - 70 + dy, 12, 18, hx("#9fdcff", 0.9 * sweat))
+    if freckles:
+        for sx in (-1, 1):
+            for k in range(4): circ(c, sx * (78 + (k % 2) * 18), ey + 30 + (k // 2) * 14, 4.5, hx("#7a3a1a", 0.45))
+    if glasses:
+        for sx in (-ex, ex):
+            c.new_path(); c.arc(sx, ey, 50, 0, 2 * math.pi); c.set_line_width(9); src(c, glasses if isinstance(glasses, str) else "#3a2a1a"); c.stroke()
+            circ(c, sx - 16, ey - 20, 10, hx("#ffffff", 0.25))
+        line(c, [(-ex + 50, ey - 4), (ex - 50, ey - 4)], glasses if isinstance(glasses, str) else "#3a2a1a", 8)
+    c.restore()
     # hand overlays
     if arms == "head":
         circ(c, -150, hy - 40, 34, skin); circ(c, 150, hy - 40, 34, skin)

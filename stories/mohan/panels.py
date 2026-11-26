@@ -7,9 +7,9 @@ import leyendas as L
 import guion as G
 
 YOU = dict(hat="beanie", skin="#a8704a", shirt="#3c6a9a", cap_col="#e8702a")
-ROSA = dict(hat="bun", skin="#a8704a", shirt="#e8c860", hair_col="#1a120c")
+ROSA = dict(hat="bun", freckles=True, skin="#a8704a", shirt="#e8c860", hair_col="#1a120c")
 PAPA = dict(hat="none", skin="#9a6440", shirt="#7a5a3a", hair_col="#2a2a2a", mustache=True)
-TIA = dict(hat="bun", skin="#c8beb4", shirt="#d8d8d0", hair_col="#1a120c")
+TIA = dict(hat="bun", glasses="#5a3a2a", skin="#c8beb4", shirt="#d8d8d0", hair_col="#1a120c")
 FOCUS = {}; CAM = {}
 
 def big(c, s_, x, y, col="#ffffff", size=120):

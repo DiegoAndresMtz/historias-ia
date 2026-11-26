@@ -88,8 +88,11 @@ def chair(c, x, y, s, col="#5a3a22", back=True):
     scaled(c, x, y, s, f)
 
 def bust_back(c, x, y, s, t, shirt="#2b2b33", hair="#1d1410", skin="#c48a5c", hood=True, sway=0.0):
+    wk = walk_amt(("back", shirt, hair), x, y, s, t)
     def f():
-        br = math.sin(t * 2.0); c.translate(math.sin(t * 3) * 6 * sway, 0)
+        br = math.sin(t * 2.0) * 0.4; c.translate(math.sin(t * 3) * 6 * sway, 0)
+        if wk > 0: ph = t * 8.5; c.translate(0, -abs(math.sin(ph)) * 26 * wk); c.rotate(math.sin(ph) * 0.045 * wk)
+        legs(c, t, wk)
         rrect(c, -209, -249 - br * 3, 418, 348, 108, OUT); rrect(c, -200, -240 - br * 3, 400, 330, 100, shirt)
         if hood: c.new_path(); c.arc(0, -250, 170, math.pi, 2 * math.pi); fill(c, hx("#000", 0.25))
         hy = -380 - br * 4
