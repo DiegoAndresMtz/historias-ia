@@ -86,3 +86,4 @@ Horario (hora Colombia, `mode: customScheduled`, `schedulingType: automatic`):
 - Dale a cada personaje un rasgo propio en su dict: glasses="#color" (abuelas, tías), freckles=True (niños), mustache=True, mole=True, pants="#color".
 - SIN LETREROS EXTRA (orden de Diego): en la imagen solo van los subtítulos, el título de arriba y la tarjeta A/B final. tag2 está apagado (scenes.TAGS = False); no dibujes carteles de texto, cuéntalo con dibujos.
 - Espíritus que lloran o gimen (La Llorona, etc.): usa la voz "L" (sollozo tembloroso + eco + voz fantasma) y el sonido "lamento" en CUES.
+- Sonidos de leyendas en CUES: "piar"/"piar_grave" (Pollo Maligno), "silbido_cerca"/"silbido_lejos" (El Silbón: escala do-re-mi que sube), "huesos" (conteo de huesos), "ladrido", "aullido", "latigo", "grito".

@@ -28,15 +28,57 @@ def llorona(c, s, t):
     _hair_strands(c, 120, -240, -40, "#0a0a0c", 9, 5, 2, t)                                               # mechones sobre la cara
     poly(c, [(-140, 170), (140, 170), (200, 300), (-200, 300)], "#e8e8ec")
 
-def silbon(c, s, t):
-    poly(c, [(-60, 120), (60, 120), (90, 300), (-90, 300)], "#1a1208")
-    c.save(); c.scale(0.8, 1.25); _skull_head(c, 100, 130, "#b8a890", "#3a3020"); c.restore()
-    _eyes(c, 90, 170, t, "#ff3a1a", (0, 0), 0.85)
-    _grin(c, 90, 200, t, 0.2, teeth=12, lip="#1a0000", stretch=0.8)
-    ell(c, 0, -150, 230, 34, "#2a1c0c"); poly(c, [(-90, -150), (90, -150), (70, -260), (-70, -260)], "#2a1c0c")
-    rect(c, -90, -175, 180, 18, "#5a3a1a")
-    ell(c, 150, 200, 70, 90, "#6a5a3a")                                                                 # el costal de huesos
-    for k in range(3): ell(c, 130 + k * 16, 150 + k * 22, 18, 8, "#e8e0c8")
+def _sombrero(c, t, seed=6, col="#2a1c0c", band="#5a3a1a"):
+    """Sombrero llanero de ala ancha, viejo y roto (el ala con mordiscos)."""
+    r = random.Random(seed)
+    pts = []
+    for k in range(40):
+        a = 2 * math.pi * k / 40; rr = 1.0 - (0.16 if r.random() < 0.18 else r.uniform(0, 0.05))
+        pts.append((math.cos(a) * 270 * rr, -150 + math.sin(a) * 44 * rr))
+    poly(c, pts, "#140c04"); c.save(); c.translate(0, -6); c.scale(0.97, 0.9); poly(c, pts, col); c.restore()
+    poly(c, [(-100, -156), (100, -156), (84, -300), (40, -318), (-30, -312), (-86, -296)], col)
+    poly(c, [(-60, -300), (40, -318), (10, -290)], hx("#000", 0.35))                                  # abolladura
+    poly(c, [(-100, -156), (100, -156), (96, -186), (-96, -186)], band)
+    for k in range(5): line(c, [(-80 + k * 40, -186), (-84 + k * 40, -296)], hx("#000", 0.18), 4)
+    poly(c, [(150, -150), (190, -140), (176, -122)], "#000")                                          # roto del ala
+
+def silbon(c, s, t, busto=True, grita=0.0):
+    """Cabeza del Silbón: cara larguísima de calavera, cuencas negras con brasa roja, mejillas chupadas,
+    boca fruncida de silbar con dientes de aguja (grita>0 la abre en un alarido), pelo tieso y sombrero roto."""
+    if busto:
+        poly(c, [(-200, 300), (-150, 170), (-40, 140), (40, 140), (150, 170), (200, 300)], "#2e2216")
+        for k in range(6): poly(c, [(-190 + k * 70, 300), (-160 + k * 70, 250), (-130 + k * 70, 300)], "#120c06")   # camisa rota
+        rect(c, -26, 100, 52, 70, "#7a6a4c"); line(c, [(-14, 104), (-20, 160)], hx("#000", 0.4), 4); line(c, [(14, 104), (20, 160)], hx("#000", 0.4), 4)
+        costal(c, 170, 250, 0.5, t)                                                                  # el costal de huesos
+    _hair_strands(c, 110, -150, 150, "#0c0a08", 16, 13, 2.5, t)                                     # pelo tieso hasta los hombros
+    c.save(); c.scale(0.78, 1.32); _skull_head(c, 105, 130, "#b4a27a", "#2a1e10"); c.restore()
+    _cracks(c, 70, 160, 21, "#140a02", 9)
+    for sx in (-1, 1):                                                                             # pómulos y mejillas chupadas
+        line(c, [(sx * 70, 0), (sx * 40, 60), (sx * 46, 120)], hx("#000", 0.5), 7)
+        line(c, [(sx * 64, -20), (sx * 78, 10)], hx("#fff0c0", 0.18), 5)
+    g = cairo.LinearGradient(0, -180, 0, 10)                                                       # sombra del sombrero sobre la frente
+    g.add_color_stop_rgba(0, 0, 0, 0, 0.92); g.add_color_stop_rgba(1, 0, 0, 0, 0.0)
+    c.save(); c.scale(0.78, 1.32); c.new_path(); c.arc(0, -40, 110, 0, 2 * math.pi); c.restore(); c.set_source(g); c.fill()
+    _eyes(c, 82, 172, t, "#ff2a0a", (0, 0.15), 0.85)
+    for sx in (-1, 1): line(c, [(sx * 62, -58), (sx * 12, -40)], "#000", 10)                       # ceño
+    poly(c, [(-8, 10), (8, 10), (0, 34)], "#000")                                                  # nariz hundida
+    my = 92
+    if grita > 0:
+        ow, oh = 30 + 26 * grita, 34 + 70 * grita
+        ell(c, 0, my + oh * 0.3, ow + 10, oh + 10, "#2a0a04"); ell(c, 0, my + oh * 0.3, ow, oh, "#0a0000")
+        for k in range(14):
+            a = 2 * math.pi * k / 14; ex, ey = math.cos(a) * ow, my + oh * 0.3 + math.sin(a) * oh
+            poly(c, [(ex - math.sin(a) * 6, ey + math.cos(a) * 6), (ex + math.sin(a) * 6, ey - math.cos(a) * 6), (ex * 0.55, my + oh * 0.3 + (ey - my - oh * 0.3) * 0.55)], "#e8dcc0")
+    else:
+        for k in range(14):                                                                        # labios arrugados, fruncidos
+            a = 2 * math.pi * k / 14
+            line(c, [(math.cos(a) * 18, my + math.sin(a) * 20), (math.cos(a) * 40, my + math.sin(a) * 40)], hx("#2a1208", 0.85), 4)
+        ell(c, 0, my, 30, 30, "#5a2414"); ell(c, 0, my, 16, 18, "#050000")
+        for k in range(9):                                                                         # dientes de aguja hacia adentro
+            a = 2 * math.pi * k / 9 + 0.3
+            poly(c, [(math.cos(a - 0.25) * 17, my + math.sin(a - 0.25) * 18), (math.cos(a + 0.25) * 17, my + math.sin(a + 0.25) * 18), (math.cos(a) * 5, my + math.sin(a) * 5)], "#e8dcc0")
+    _drip(c, 34, 150, t, "#4a0000", 2)
+    c.save(); c.translate(0, -12); c.scale(0.86, 0.86); _sombrero(c, t); c.restore()
 
 def patasola(c, s, t):
     r = random.Random(7)
@@ -505,5 +547,118 @@ def mohan_cuerpo(c, x, y, s, t, cara="monstruo", brazos="caidos", tabaco=True, g
         if tabaco: _tabaco(c, 50, 50, -0.35, t)
     else:
         mohan(c, 1, t, tabaco)
+    c.restore()
+    c.restore()
+
+# ---------- El Silbón de cuerpo entero ----------
+def _raices(c, x, y, ang, t, L_=150, n=5, skin="#8a7a58", seed=0):
+    """Mano huesuda con dedos larguísimos como raíces y uñas negras."""
+    r = random.Random(seed)
+    ell(c, x, y, 30, 26, skin)
+    for k in range(n):
+        a = ang + (k - (n - 1) / 2) * 0.24; pts = [(x, y)]; px, py = x, y
+        for j in range(1, 5):
+            aa = a + math.sin(t * 2 + k + j) * 0.05 + r.uniform(-0.12, 0.12)
+            px += math.cos(aa) * L_ / 4; py += math.sin(aa) * L_ / 4; pts.append((px, py))
+        line(c, pts, "#2a2014", 13); line(c, pts, skin, 8)
+        for j in (1, 2): circ(c, pts[j][0], pts[j][1], 6, skin)                                         # nudillos
+        poly(c, [(px - 5, py - 5), (px + 5, py + 5), (px + math.cos(a) * 26, py + math.sin(a) * 26)], "#050302")
+
+def costal(c, x, y, s, t, mueve=0.0, abierto=False):
+    """Costal viejo de fique, con huesos asomados. mueve>0: algo patalea adentro."""
+    c.save(); c.translate(x, y); c.scale(s, s)
+    k1 = math.sin(t * 7) * 18 * mueve; k2 = math.sin(t * 5.3 + 1) * 22 * mueve
+    c.new_path(); c.move_to(-60, -200); c.curve_to(-170 + k1, -120, -180, 120 + k2, -60, 170)
+    c.curve_to(20, 200, 150, 180, 160 + k2, 60); c.curve_to(170, -60 + k1, 90, -170, 50, -200); c.close_path()
+    src(c, "#6a5634"); c.fill_preserve(); c.set_line_width(7); src(c, "#2a2010"); c.stroke()
+    for k in range(9): line(c, [(-140 + k * 34, -120), (-150 + k * 36, 160)], hx("#3a2e18", 0.35), 3)    # tejido
+    for k in range(4): line(c, [(-150, -60 + k * 60), (150, -70 + k * 60)], hx("#3a2e18", 0.3), 3)
+    if mueve:   # bultos de pies y manos empujando desde adentro
+        ell(c, -100 + k1, 40, 34, 40, hx("#8a7448", 0.9)); ell(c, 90, -40 + k2, 30, 44, hx("#8a7448", 0.9))
+    if not abierto:
+        line(c, [(-60, -200), (50, -200)], "#3a2a14", 16)
+        for a, L_ in ((-1.9, 90), (-1.4, 110), (-1.1, 80)):        # huesos asomados
+            ex, ey = math.cos(a) * L_, -200 + math.sin(a) * L_
+            line(c, [(0, -200), (ex, ey)], "#e2d8bc", 16); circ(c, ex, ey, 13, "#efe6cc"); circ(c, ex + 8, ey + 4, 10, "#efe6cc")
+    c.restore()
+
+def silbon_cuerpo(c, x, y, s, t, cara="monstruo", brazos="caidos", con_costal=True, mueve=0.0, bend=0.0, glow_a=1.0, ardor=0.0, mordidas=0.0):
+    """El Silbón de cuerpo entero: altísimo (~1850*s), flaquísimo, piernas de palo, pies descalzos plantados,
+    pantalón remangado y camisa rota que deja ver costillas, brazos hasta las rodillas con dedos de raíz,
+    sombrero roto y el costal de huesos al hombro.
+    cara: 'monstruo' | 'sombra' (lejos: silueta y dos brasas) | 'grita'
+    brazos: 'caidos' | 'costal' (lo carga al hombro) | 'agarra' (manos hacia adelante) | 'arriba'
+    bend: radianes que se dobla el torso desde la cadera (+ adelante/derecha, - hacia atrás).
+    ardor: piernas quemadas de ají (0..1). mordidas: marcas de perro en los talones."""
+    dx, dy, rot = _twitch(t, 1, 0.8)
+    skin, skin_d, cloth, rags = "#8a7a58", "#2a2014", "#3a2c1a", "#4a3a24"
+    c.save(); c.translate(x, y); c.scale(s, s)
+    glow(c, 0, -900, 900, "#ff3a1a", 0.07 * glow_a)
+    # piernas de palo con rodillas nudosas; pies plantados
+    for sx in (-1, 1):
+        hip, knee, ank = (sx * 58, -820), (sx * 74, -430), (sx * 62, -70)
+        line(c, [hip, knee, ank], skin_d, 44); line(c, [hip, knee, ank], skin, 34)
+        circ(c, knee[0], knee[1], 30, skin_d); circ(c, knee[0], knee[1], 24, skin)
+        line(c, [(knee[0] - 8, knee[1] + 40), (ank[0] - 6, ank[1] - 30)], hx("#000", 0.25), 5)              # canilla
+        # pie largo descalzo con dedos huesudos
+        poly(c, [(ank[0] - 30, ank[1]), (ank[0] + 24, ank[1] - 10), (ank[0] + sx * 120, -14), (ank[0] + sx * 130, 4), (ank[0] - 40, 4)], skin_d)
+        poly(c, [(ank[0] - 24, ank[1] + 4), (ank[0] + 20, ank[1] - 4), (ank[0] + sx * 112, -12), (ank[0] + sx * 118, -2), (ank[0] - 34, -2)], skin)
+        for k in range(4):
+            tx = ank[0] + sx * (70 + k * 16); line(c, [(tx, -10), (tx + sx * 18, 2)], skin, 9); circ(c, tx + sx * 20, 3, 5, "#050302")
+        if mordidas:   # mordidas de los perros de la maldición
+            for k in range(4): circ(c, ank[0] - 20 + k * 12, ank[1] + 10 - (k % 2) * 14, 5, hx("#8a0000", mordidas))
+            _drip(c, ank[0] - 10, ank[1] + 16, t + sx, hx("#7a0000", mordidas), 3 + sx)
+        if ardor:
+            for k in range(5): ell(c, knee[0] + (k - 2) * 10, knee[1] + 80 + k * 50, 22, 14, hx("#c8200a", 0.75 * ardor))
+            glow(c, knee[0], knee[1] + 160, 160, "#ff5a1a", 0.25 * ardor)
+        # pantalón remangado y roto hasta la rodilla
+        r = random.Random(30 + sx)
+        hem = [(knee[0] + sx * 46, knee[1] + 40)] + [(knee[0] + sx * (46 - j * 23), knee[1] + 40 + r.uniform(-10, 40)) for j in range(1, 5)]
+        poly(c, [(sx * 6, -880), (sx * 104, -880)] + hem, cloth)
+    c.save(); c.translate(dx, 0)
+    c.translate(0, -820); c.rotate(bend + rot * 0.3); c.translate(0, 820)
+    sh_y = -1360
+    # costal detrás de la espalda
+    if con_costal and brazos == "costal":
+        costal(c, -150, -1120, 1.05, t, mueve)
+    # torso flaco, camisa rota con costillas
+    torso = [(-70, -820), (-96, -1000), (-150, sh_y), (150, sh_y), (96, -1000), (70, -820)]
+    poly(c, torso, skin)
+    for k in range(7):
+        yy = -1300 + k * 50; line(c, [(-80 + k * 3, yy), (-20, yy + 18), (20, yy + 18), (80 - k * 3, yy)], hx(skin_d, 0.7), 7)
+    r = random.Random(40)
+    poly(c, [(-150, sh_y), (-40, sh_y), (-70, -1180), (-110, -1060), (-96, -1000)], rags)               # jirones de camisa
+    poly(c, [(150, sh_y), (50, sh_y), (90, -1200), (60, -1080), (96, -1000)], rags)
+    poly(c, [(-70, -820), (-96, -1000), (-50, -960), (-20, -1010), (10, -940), (50, -990), (96, -1000), (70, -820)], rags)
+    rect(c, -76, -850, 152, 30, "#1a120a"); rect(c, -14, -852, 28, 34, "#6a5a3a")                       # cabuya de cinturón
+    # brazos larguísimos
+    for sx in (-1, 1):
+        shp = (sx * 140, sh_y + 20)
+        if brazos == "agarra":
+            el, hd, ang = (sx * 190 + 120, sh_y + 300), (sx * 120 + 360, sh_y + 420 + math.sin(t * 3 + sx) * 20), 0.25
+        elif brazos == "arriba":
+            el, hd, ang = (sx * 290, sh_y - 200), (sx * 330, sh_y - 520 + math.sin(t * 4 + sx) * 20), -math.pi / 2 + sx * 0.3
+        elif brazos == "costal" and sx < 0:
+            el, hd, ang = (-230, sh_y + 160), (-150, sh_y - 30), -math.pi / 2
+        else:
+            el, hd, ang = (sx * 190, sh_y + 380), (sx * 200, sh_y + 760 + math.sin(t * 1.4 + sx) * 10), math.pi / 2 + sx * 0.12
+        line(c, [shp, el, hd], skin_d, 36); line(c, [shp, el, hd], skin, 27)
+        circ(c, el[0], el[1], 18, skin)
+        _raices(c, hd[0], hd[1], ang, t, 170, 5, skin, 7 + sx)
+        poly(c, [(shp[0] - 40, shp[1] - 30), (shp[0] + 40, shp[1] - 30), (shp[0] + sx * 60, shp[1] + 120)], rags)   # manga rota
+    if con_costal and brazos == "costal":
+        line(c, [(-150, sh_y - 30), (-150, -1300)], "#3a2a14", 14)                                         # boca del costal en el puño
+    # cuello de tendones y cabeza
+    rect(c, -26, sh_y - 90, 52, 100, skin)
+    for sx in (-1, 1): line(c, [(sx * 16, sh_y - 86), (sx * 22, sh_y + 6)], hx("#000", 0.35), 5)
+    c.save(); c.translate(0, sh_y - 200); c.rotate(rot); c.scale(0.92, 0.92)
+    if cara == "sombra":
+        _hair_strands(c, 110, -150, 150, "#050403", 16, 13, 2.5, t)
+        c.save(); c.scale(0.78, 1.32); circ(c, 0, 0, 120, "#060403"); c.restore()
+        for sx in (-1, 1): glow(c, sx * 30, -30, 70, "#ff2a0a", 0.75); circ(c, sx * 30, -30, 8, "#ff6a3a"); circ(c, sx * 30, -30, 3, "#fff")
+        c.save(); c.translate(0, -12); c.scale(0.86, 0.86); _sombrero(c, t, col="#0a0604", band="#140c06"); c.restore()
+    else:
+        silbon(c, 1, t, busto=False, grita=(1.0 if cara == "grita" else 0.0))
+    c.restore()
     c.restore()
     c.restore()

@@ -93,7 +93,61 @@ def piar(f0=3100, f1=2000, n=3, gap=0.42, d=0.16, rasp=0.0):
         i = int(k * gap * SR); s[i:i + len(v)] += v
         j = i + int(0.11 * SR); s[j:j + len(v)] += v * 0.35
     return s * 0.45
-FX = {"piar": piar, "piar_grave": lambda: piar(520, 300, 3, 0.55, 0.32, 0.7), "whoosh": lambda: whoosh(0.9) * 1.6, "lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
+ESCALA = [523.3, 587.3, 659.3, 698.5, 784.0, 880.0, 987.8]   # do re mi fa sol la si
+def silbido(lejos=False, n=7, nd=0.3):
+    """El Silbón: silbido humano que sube la escala do-re-mi-fa-sol-la-si, con soplo, vibrato y un quiebre al final.
+    lejos=True: apagado, con eco de sabana."""
+    s = np.zeros(int((nd * n + 1.6) * SR))
+    for k in range(n):
+        d = nd * (1.6 if k == n - 1 else 1.0); t = T(d)
+        f0 = ESCALA[k % 7] * (1.0 if not lejos else 0.995)
+        f = f0 * (1 + 0.018 * np.sin(2 * np.pi * 6.2 * t)) * (1 - 0.03 * np.exp(-t / 0.03))
+        if k == n - 1: f = f * (1 + 0.06 * (t / d) ** 2)       # el último se tuerce hacia arriba
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        v = np.sin(ph) + 0.08 * np.sin(2 * ph) + bp(rng.normal(0, 1, len(t)), f0 * 0.8, min(f0 * 1.6, 9000)) * 0.35
+        v = v * np.sin(np.pi * t / d) ** 0.5
+        i = int(k * nd * SR); s[i:i + len(v)] += v
+    if lejos:
+        s = lp(s, 1800) * 0.55; e = np.zeros_like(s)
+        for dl, g in ((0.18, 0.5), (0.41, 0.33), (0.7, 0.2)): j = int(dl * SR); e[j:] += s[:-j] * g
+        s = s + e
+    return s * 0.42
+def huesos(n=7):
+    """Huesos que caen del costal y se cuentan: golpes secos de hueso contra madera."""
+    s = np.zeros(int(3.2 * SR)); tt = 0.0
+    for k in range(n):
+        m = int(0.07 * SR); t = T(0.07); f = rng.uniform(900, 1500)
+        v = (np.sin(2 * np.pi * f * t) * 0.6 + bp(rng.normal(0, 1, m), 1200, 5000)) * env(m, 0.0005, 0.012)
+        v += np.sin(2 * np.pi * rng.uniform(180, 260) * t) * env(m, 0.001, 0.03) * 0.6
+        i = int(tt * SR); s[i:i + m] += v * rng.uniform(0.7, 1.0); tt += rng.uniform(0.32, 0.48)
+    return s * 0.8
+def ladrido(n=3):
+    s = np.zeros(int(1.6 * SR))
+    for k in range(n):
+        d = 0.16; t = T(d); f = 520 * np.exp(-t * 4) + 200
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        v = np.sign(np.sin(ph)) * 0.4 + np.sin(ph) + bp(rng.normal(0, 1, len(t)), 400, 2500) * 0.9
+        v = bp(v, 250, 3000) * env(len(t), 0.004, 0.07)
+        i = int(k * 0.3 * SR); s[i:i + len(v)] += v
+    return s * 0.6
+def aullido(d=2.8):
+    t = T(d); f = 430 + 300 * np.sin(np.pi * t / d) ** 1.5 - 80 * (t / d) + 9 * np.sin(2 * np.pi * 5 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = np.sin(ph) + 0.45 * np.sin(2 * ph) + 0.15 * np.sin(3 * ph) + bp(rng.normal(0, 1, len(t)), 500, 2000) * 0.12
+    return v * np.minimum(1, t / 0.4) * np.clip((d - t) / 0.9, 0, 1) * 0.35
+def latigo():
+    w = whoosh(0.25) * 0.7; m = int(0.05 * SR)
+    crack = hp(rng.normal(0, 1, m), 1500) * env(m, 0.0002, 0.006) * 2.2
+    s = np.zeros(int(0.6 * SR)); s[:len(w)] += w; j = len(w) - int(0.02 * SR); s[j:j + m] += crack
+    return s
+def grito(d=1.6):
+    """Alarido del espanto quemado: voz rasgada que baja de tono."""
+    t = T(d); f = 820 * np.exp(-t * 0.9) + 140 + 30 * np.sin(2 * np.pi * 9 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = np.tanh(3 * (np.sin(ph) + 0.6 * np.sin(2.01 * ph) + 0.4 * np.sin(3.02 * ph))) + bp(rng.normal(0, 1, len(t)), 800, 4000) * 0.6
+    return bp(v, 200, 5000) * np.minimum(1, t / 0.05) * np.clip((d - t) / 0.6, 0, 1) * 0.5
+FX = {"silbido_cerca": silbido, "silbido_lejos": lambda: silbido(True), "huesos": huesos, "ladrido": ladrido, "aullido": aullido,
+      "latigo": latigo, "grito": grito, "piar": piar, "piar_grave": lambda: piar(520, 300, 3, 0.55, 0.32, 0.7), "whoosh": lambda: whoosh(0.9) * 1.6, "lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
       "heart": lambda: np.concatenate([heart(), heart()]), "doorbell": doorbell, "scrape": scrape, "paper": paper, "steps": steps,
       "riser_end": lambda: riser(1.2, 200, 900) * 0.6}
 
