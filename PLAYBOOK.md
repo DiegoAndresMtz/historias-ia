@@ -128,5 +128,7 @@ Pasos para una historia nueva <slug> (3 partes):
    - La tarjeta A/B, el título, los subtítulos (3 palabras, KEY en amarillo), el grano y el audio los pone Episode solo.
 5. MIRA cuadros antes del render: `cd remo && npx remotion still src/index.ts <slug-con-guiones>-p1 /tmp/x.png --frame=120 --browser-executable=/usr/bin/google-chrome`.
    Revisa que se vean los personajes, que nada quede negro y que el susto se vea.
-6. Render: `bash engine/remo_render.sh <slug> <N> videos/<fecha>/<slug>_pN.mp4` (≈12 min por parte; córrelo en segundo plano y espera).
+6. Render: `bash engine/remo_render.sh <slug> <N> videos/<fecha>/<slug>_pN.mp4` (≈9–12 min por parte; córrelo en segundo plano y espera).
+   El script recomprime al final (~7 Mbps): sin eso salen archivos de 70–100 MB que GitHub rechaza.
+   Historias hechas con este motor: zombi_super (supermercado), zombi_transmi (TransMilenio).
 7. YouTube (partes 2 y 3 juntas): `ffmpeg -f concat -safe 0 -i lista.txt -c copy videos/<fecha>/<slug>_p2y3_youtube.mp4`.
