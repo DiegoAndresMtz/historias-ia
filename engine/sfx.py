@@ -146,7 +146,14 @@ def grito(d=1.6):
     ph = 2 * np.pi * np.cumsum(f) / SR
     v = np.tanh(3 * (np.sin(ph) + 0.6 * np.sin(2.01 * ph) + 0.4 * np.sin(3.02 * ph))) + bp(rng.normal(0, 1, len(t)), 800, 4000) * 0.6
     return bp(v, 200, 5000) * np.minimum(1, t / 0.05) * np.clip((d - t) / 0.6, 0, 1) * 0.5
-FX = {"silbido_cerca": silbido, "silbido_lejos": lambda: silbido(True), "huesos": huesos, "ladrido": ladrido, "aullido": aullido,
+def growl(d=1.1):
+    """Gruñido de zombi: ronquido grave y áspero que se quiebra."""
+    t = T(d); f = 70 + 25 * np.sin(2 * np.pi * 3.3 * t) + 15 * np.sin(2 * np.pi * 11 * t)
+    ph = 2 * np.pi * np.cumsum(f) / SR
+    v = np.tanh(4 * (np.sin(ph) + 0.6 * np.sin(2.03 * ph))) * (0.6 + 0.4 * np.abs(np.sin(2 * np.pi * 17 * t)))
+    v = bp(v + bp(rng.normal(0, 1, len(t)), 200, 1800) * 0.9, 90, 2600)
+    return v * np.minimum(1, t / 0.08) * np.clip((d - t) / 0.4, 0, 1) * 0.6
+FX = {"growl": growl, "silbido_cerca": silbido, "silbido_lejos": lambda: silbido(True), "huesos": huesos, "ladrido": ladrido, "aullido": aullido,
       "latigo": latigo, "grito": grito, "piar": piar, "piar_grave": lambda: piar(520, 300, 3, 0.55, 0.32, 0.7), "whoosh": lambda: whoosh(0.9) * 1.6, "lamento": lamento, "creak": creak, "knock3": knock3, "lock": lock, "whisper": whisper, "pop": lambda: pop_(), "ping": lambda: ping(1568, 0.5), "boom": lambda: boom(2.8, 45), "boom_s": lambda: boom(1.6, 65) * 0.7,
       "heart": lambda: np.concatenate([heart(), heart()]), "doorbell": doorbell, "scrape": scrape, "paper": paper, "steps": steps,
       "riser_end": lambda: riser(1.2, 200, 900) * 0.6}
