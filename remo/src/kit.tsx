@@ -1,6 +1,6 @@
 // Kit de animación «cine de terror» para Remotion: personajes Open Peeps (CC0), zombis, luz, cámara, grano.
 import React from 'react';
-import {useCurrentFrame, useVideoConfig, interpolate, spring, Easing, random} from 'remotion';
+import {useCurrentFrame, useVideoConfig, random, Img, staticFile, AbsoluteFill, Audio} from 'remotion';
 import Peep from 'react-peeps';
 
 export const W = 1080, H = 1920;
@@ -101,13 +101,8 @@ export const ZombieCloseup: React.FC<{t: number; k?: number; scale?: number}> = 
 };
 
 // ---------- luz, cámara, grano ----------
-export const Grain: React.FC<{t: number; a?: number}> = ({t, a = 0.14}) => {
-  const seed = Math.floor(t * 24) % 50;
-  return (<svg style={{position: 'absolute', inset: 0, width: W, height: H, mixBlendMode: 'overlay', opacity: a, pointerEvents: 'none'}}>
-    <filter id={`gr${seed}`}><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed={seed} /><feColorMatrix type="saturate" values="0" /></filter>
-    <rect width="100%" height="100%" filter={`url(#gr${seed})`} />
-  </svg>);
-};
+export const Grain: React.FC<{t: number; a?: number}> = ({t, a = 0.1}) => (
+  <Img src={staticFile(`grain${Math.floor(t * 24) % 8}.png`)} style={{position: 'absolute', inset: 0, width: W, height: H, mixBlendMode: 'overlay', opacity: a}} />);
 export const Vignette: React.FC<{a?: number; col?: string}> = ({a = 0.75, col = '0,0,0'}) => (
   <div style={{position: 'absolute', inset: 0, background: `radial-gradient(ellipse at 50% 45%, rgba(${col},0) 35%, rgba(${col},${a}) 100%)`}} />);
 export const Flash: React.FC<{t: number; at: number; col?: string; d?: number}> = ({t, at, col = '255,255,255', d = 0.25}) => {
@@ -123,4 +118,59 @@ export const Camera: React.FC<{t: number; keys: [number, number, number, number]
   }
   const sx = shake * Math.sin(t * 53) * 14, sy = shake * Math.cos(t * 47) * 10;
   return <div style={{position: 'absolute', inset: 0, transformOrigin: `${cx}px ${cy}px`, transform: `translate(${sx}px,${sy}px) scale(${z})`}}>{children}</div>;
+};
+
+// ---------- episodio genérico: escenas + subtítulos + título + tarjeta A/B + audio ----------
+export type Meta = {title: [string, string]; badge: string; endcard: [string, string, string, string]; keys: string[]; audio: string; tl: TL;
+  scenes: Record<string, React.FC<{t: number; w: (tok: string) => number}>>};
+const normK = (s: string) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-zñ0-9]/g, '');
+const Captions: React.FC<{t: number; m: Meta}> = ({t, m}) => {
+  const L = m.tl.lines; const last = L[L.length - 1];
+  const l = L.find(x => t >= x.start - 0.05 && t < x.end + 0.3); if (!l || l === last) return null;
+  const ws = l.words; let i = ws.findIndex(x => t < x[2]); if (i < 0) i = ws.length - 1;
+  const g0 = Math.floor(i / 3) * 3, grp = ws.slice(g0, g0 + 3);
+  const pop = ease((t - grp[0][1]) / 0.12); const K = new Set(m.keys.map(normK));
+  return (<div style={{position: 'absolute', top: 1180, width: W, textAlign: 'center', padding: '0 60px', boxSizing: 'border-box', transform: `scale(${0.85 + 0.15 * pop})`}}>
+    {grp.map((x, j) => { const on = t >= x[1]; const key = K.has(normK(x[0]));
+      return <React.Fragment key={j}><span style={{display: 'inline-block', fontFamily: 'Montserrat', fontWeight: 900, fontSize: 84, lineHeight: 1.1,
+        textTransform: 'uppercase', margin: '0 12px', color: key && on ? '#ffd23a' : '#ffffff', opacity: on ? 1 : 0.55, WebkitTextStroke: '14px #000',
+        paintOrder: 'stroke fill', textShadow: '0 8px 18px rgba(0,0,0,.6)'}}>{x[0]}</span>{' '}</React.Fragment>; })}
+  </div>);
+};
+const Title: React.FC<{m: Meta}> = ({m}) => (
+  <div style={{position: 'absolute', top: 110, left: 60, right: 60, background: '#fff', borderRadius: 30, padding: '30px 30px 26px', textAlign: 'center', boxShadow: '0 12px 30px rgba(0,0,0,.45)'}}>
+    <div style={{position: 'absolute', top: -26, left: '50%', transform: 'translateX(-50%)', background: '#e0303a', color: '#fff', fontFamily: 'Montserrat',
+      fontWeight: 900, fontSize: 32, padding: '6px 22px', borderRadius: 20, whiteSpace: 'nowrap'}}>{m.badge}</div>
+    <div style={{fontFamily: 'Montserrat', fontWeight: 800, fontSize: 44, color: '#111', lineHeight: 1.25}}>{m.title[0]}<br />{m.title[1]}</div>
+  </div>);
+const EndCard: React.FC<{t: number; m: Meta}> = ({t, m}) => {
+  const L = m.tl.lines, l = L[L.length - 1]; if (t < l.start - 0.2) return null;
+  const wt = (tok: string) => wordTime(m.tl, l.scene, tok); const a = ramp(t, l.start - 0.2, 0.4);
+  const opt = (lab: string, txt: string, i: number) => { const b = ramp(t, wt(lab) - 0.3, 0.35);
+    return (<div style={{margin: '26px 70px', padding: '30px 36px', borderRadius: 34, display: 'flex', alignItems: 'center', gap: 28, opacity: b,
+      transform: `translateY(${40 * (1 - b)}px)`, background: 'rgba(18,20,28,.94)', border: `5px solid ${i === 0 ? '#f2c230' : '#5aa0ff'}`}}>
+      <div style={{minWidth: 104, height: 104, borderRadius: 52, background: i === 0 ? '#f2c230' : '#5aa0ff', color: '#111', fontSize: 66, fontWeight: 900,
+        display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Montserrat'}}>{lab}</div>
+      <div style={{color: '#fff', fontSize: 48, fontWeight: 800, fontFamily: 'Montserrat', lineHeight: 1.15}}>{txt}</div></div>); };
+  return (<AbsoluteFill style={{background: `rgba(0,0,0,${0.62 * a})`}}>
+    <div style={{position: 'absolute', top: 500, width: W, opacity: a}}>
+      <div style={{textAlign: 'center', color: '#fff', fontFamily: 'Montserrat', fontWeight: 900, fontSize: 88}}>{m.endcard[0]}</div>
+      {opt('A', m.endcard[1], 0)}{opt('B', m.endcard[2], 1)}
+      <div style={{textAlign: 'center', color: '#f2c230', fontFamily: 'Montserrat', fontWeight: 900, fontSize: 66, marginTop: 36}}>COMENTA A o B</div>
+      <div style={{textAlign: 'center', color: '#cfd3dc', fontFamily: 'Montserrat', fontWeight: 800, fontSize: 40, marginTop: 14}}>{m.endcard[3]}</div>
+    </div></AbsoluteFill>);
+};
+export const Episode: React.FC<{m: Meta}> = ({m}) => {
+  const t = useT(); const L = m.tl.lines;
+  const idx = Math.max(0, L.findIndex((l, i) => t < (L[i + 1]?.start ?? 1e9) - 0.4));
+  const sc = L[idx].scene, S = m.scenes[sc];
+  const st = idx === 0 ? 0 : L[idx].start - 0.4; const cut = clamp((t - st) / 0.12);
+  const w = (tok: string) => wordTime(m.tl, sc, tok);
+  return (<AbsoluteFill style={{background: '#000'}}>
+    <AbsoluteFill style={{opacity: idx === 0 ? 1 : cut}}>{S ? <S t={t} w={w} /> : null}</AbsoluteFill>
+    <Vignette a={0.7} /><Grain t={t} a={0.1} />
+    <EndCard t={t} m={m} />
+    <Title m={m} /><Captions t={t} m={m} />
+    <Audio src={staticFile(m.audio)} />
+  </AbsoluteFill>);
 };

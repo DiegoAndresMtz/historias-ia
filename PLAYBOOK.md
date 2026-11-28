@@ -103,3 +103,30 @@ personajes de palitos, narradas en SEGUNDA PERSONA, en un lugar cotidiano y reco
 - Personaje «tú» = gorra amarilla (cap="#f2c230"). 4–6 personajes con un rasgo cada uno.
 - Final cerrado y trágico en el Día tres (sin segunda temporada). Última línea: «¿Tú …? Opción A … Opción B … Comenta A o B. Y sígueme para más historias de supervivencia.»
 - Textos de Buffer: «Día N del brote zombi: …» + #zombies #historiasdeterror #apocalipsiszombie #terror #historiasvarias.
+
+## 1d. MOTOR DE ANIMACIÓN ACTUAL (desde 28-nov, orden de Diego): Remotion + Open Peeps
+Diego pidió animaciones de mejor calidad. Ya NO se usa engine/render.py (palitos/Cairo) para los videos: se anima con
+Remotion (React, carpeta remo/) y personajes dibujados a mano de Open Peeps (react-peeps, ilustraciones CC0).
+La voz, los efectos y la música siguen saliendo de Python (guion.py → tts.py → sfx.py).
+
+Pasos para una historia nueva <slug> (3 partes):
+1. `bash setup.sh` (instala también remo/node_modules). Chrome está en /usr/bin/google-chrome.
+2. stories/<slug>/guion.py igual que siempre (PARTS, KEY, CUES, MUSIC, ENDCARD, TITLE). panels.py ya no hace falta.
+3. Audio de cada parte: `bash engine/remo_audio.sh <slug> <N>` → remo/src/data/<slug>_pN.json + remo/public/<slug>_pN.m4a.
+4. Escenas: crea remo/src/stories/<slug>.tsx copiando la estructura de remo/src/stories/zombi_super.tsx:
+   - una función por escena (mismo id que en guion.py) que recibe {t, w}; w('palabra') = segundo en que se dice esa palabra.
+   - export const <SLUG>: Record<number, Meta> = {1: {title, badge: 'DÍA 1', keys, audio: '<slug>_p1.m4a', tl: <json>, scenes, endcard}, 2: …, 3: …}
+   - regístrala en remo/src/stories/index.ts.
+   Piezas disponibles (remo/src/kit.tsx y sets.tsx):
+   - Char: persona de cuerpo entero (pose, face, hair, skin, clothes, flip, walk, zombie). Poses de pie: ShirtPantsBW/WB, RestingBW/WB,
+     WalkingBW/WB, PointingFingerBW/WB, CrossedArmsBW/WB, EasingBW/WB, BlazerPantsBW/WB, RoboDanceOutline (zombis); sentado: ClosedLegWB…
+     Caras: Calm, Smile, Fear, ConcernedFear, Awe, Concerned, Serious, Suspicious, Driven, Rage, Angry, Tired, Solemn, EyesClosed, Explaining, Cute.
+     Pelo: Short, ShortScratch, ShortMessy, Long, Bun, Buns, GrayBun, Bald, BaldTop, Afro, Medium, MediumStraight, HatHip, Beanie…
+   - zombie: <Char zombie pose="RoboDanceOutline" …/> (piel verdosa, ojos rojos, dientes, tirones). ZombieCloseup = primer plano que asusta.
+   - Camera (zoom suave a palabras clave + sacudón), Flash, Vignette; escenarios: Market, Counter, Gate, ColdRoom, Skylight, Night, BackLot,
+     Parking, Alley, Truck, Moto. Agrega escenarios nuevos a sets.tsx cuando el lugar lo pida (SVG 1080x1920, piso en FLOOR=1500).
+   - La tarjeta A/B, el título, los subtítulos (3 palabras, KEY en amarillo), el grano y el audio los pone Episode solo.
+5. MIRA cuadros antes del render: `cd remo && npx remotion still src/index.ts <slug-con-guiones>-p1 /tmp/x.png --frame=120 --browser-executable=/usr/bin/google-chrome`.
+   Revisa que se vean los personajes, que nada quede negro y que el susto se vea.
+6. Render: `bash engine/remo_render.sh <slug> <N> videos/<fecha>/<slug>_pN.mp4` (≈12 min por parte; córrelo en segundo plano y espera).
+7. YouTube (partes 2 y 3 juntas): `ffmpeg -f concat -safe 0 -i lista.txt -c copy videos/<fecha>/<slug>_p2y3_youtube.mp4`.

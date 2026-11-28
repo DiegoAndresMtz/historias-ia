@@ -18,3 +18,5 @@ if ! fc-list | grep -qi montserrat; then
   fc-cache -f >/dev/null
 fi
 echo "Listo: librerías, voz y fuentes instaladas."
+# Motor de animación Remotion (personajes Open Peeps, CC0)
+if [ -f remo/package.json ]; then (cd remo && npm ci --silent --no-audit --no-fund) && echo "Remotion listo"; fi
