@@ -87,3 +87,19 @@ Horario (hora Colombia, `mode: customScheduled`, `schedulingType: automatic`):
 - SIN LETREROS EXTRA (orden de Diego): en la imagen solo van los subtítulos, el título de arriba y la tarjeta A/B final. tag2 está apagado (scenes.TAGS = False); no dibujes carteles de texto, cuéntalo con dibujos.
 - Espíritus que lloran o gimen (La Llorona, etc.): usa la voz "L" (sollozo tembloroso + eco + voz fantasma) y el sonido "lamento" en CUES.
 - Sonidos de leyendas en CUES: "piar"/"piar_grave" (Pollo Maligno), "silbido_cerca"/"silbido_lejos" (El Silbón: escala do-re-mi que sube), "huesos" (conteo de huesos), "ladrido", "aullido", "latigo", "grito".
+
+## 1c. FORMATO ACTUAL (desde 28-nov, orden de Diego): «Brote zombi» — trend #1 de terror en TikTok (nov-2026)
+Diego pidió dejar la ruleta y recrear lo más viral. El trend: historias de supervivencia a un brote zombi, animadas con
+personajes de palitos, narradas en SEGUNDA PERSONA, en un lugar cotidiano y reconocible, avanzando por días
+(«Día uno…»), y cada parte termina en una decisión A/B. El LUGAR es el gancho.
+- Ejemplo completo: stories/zombi_super/ (guion.py + panels.py). Motor de dibujo: engine/palitos.py
+  (stick, zombi, horda, cara_zombi, supermercado, reja, cuarto_frio, techo_vidrio, calle_noche, camion, moto, callejon).
+- Lugar NUEVO en Colombia cada historia (no repetir): TransMilenio/bus articulado, conjunto residencial, colegio,
+  hospital, centro comercial, finca, peaje, estadio, edificio de oficinas, avión, ferry, discoteca, iglesia, cárcel…
+  Agrega a palitos.py los escenarios que falten.
+- TITLE = ("Brote zombi en <ciudad>:", "<quedaste atrapado en …>"). Parte 1 = Día uno, Parte 2 = Día dos, Parte 3 = Día tres.
+- GANCHO: la primera frase arranca con acción; el primer ataque pasa ANTES del segundo 4. Nada de presentaciones.
+- Partes de 40–55 s (6–8 líneas). Voz N. Zombis que den miedo: primer plano con cara_zombi en el momento fuerte, growl en CUES.
+- Personaje «tú» = gorra amarilla (cap="#f2c230"). 4–6 personajes con un rasgo cada uno.
+- Final cerrado y trágico en el Día tres (sin segunda temporada). Última línea: «¿Tú …? Opción A … Opción B … Comenta A o B. Y sígueme para más historias de supervivencia.»
+- Textos de Buffer: «Día N del brote zombi: …» + #zombies #historiasdeterror #apocalipsiszombie #terror #historiasvarias.
