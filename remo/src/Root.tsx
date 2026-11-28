@@ -9,5 +9,5 @@ const LIST = Object.entries(STORIES).flatMap(([id, parts]) => Object.entries(par
   return {id: `${id.replace(/_/g, '-')}-p${n}`, C, frames: Math.ceil((m as Meta).tl.END * 30)};
 }));
 export const Root: React.FC = () => (<>
-  {LIST.map(x => <Composition key={x.id} id={x.id} component={x.C} width={1080} height={1920} fps={30} durationInFrames={x.frames} />)}
+  {LIST.map(x => <React.Fragment key={x.id}><Composition id={x.id} component={x.C} width={1080} height={1920} fps={30} durationInFrames={x.frames} /></React.Fragment>)}
 </>);
